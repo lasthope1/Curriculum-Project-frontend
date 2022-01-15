@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import styled from 'styled-components';
-
-import Question from './question';
 import Popup from './Info-Popup';
 
 const NavigationWrapper = styled.nav`
     background: #9A3CF6;
+    height: var(--nav-size)
     display: flex;
     padding: 10px 32px;
     align-items: center;
     justify-content: space-between;
+    border-bottom: var(--border);
 `;
 
 const PlanButton = styled.button`
@@ -24,23 +24,30 @@ const PlanButton = styled.button`
 export default function NavigationBar(){
 
     const [buttonPopup, setButtonPopup] = useState(false);
-    var EduPlan : string = "Normal Plan";
-    
-    function setEduPlan(plan : string) {
-        (plan === "normal") ? EduPlan = "Normal Plan"
-        : EduPlan = "Co-operative Plan";
-        console.log(plan);
-        console.log(`Saved for ${EduPlan}`);
+    const [EduPlan, setEduPlan] = useState("Normal Plan");
+    var planState : string = setPlanState(EduPlan);
+
+    function setPlanState(planSelected: string): string {
+        if(planSelected === "Normal Plan"){
+            return "Normal Plan"
+        }else{
+            return "Cooperative Plan"
+        }
     }
     
     return (
         <NavigationWrapper className='navbar'>
             <PlanButton onClick={() => setButtonPopup(true) }>{EduPlan}</PlanButton>
-            <div>
+            {/* <div>
                 <i className='GPA'>student'gpa | </i>
                 <i className='circle' >account_circle</i>
-            </div>
-            <Popup trigger={buttonPopup} setTrigger={setButtonPopup} parentCallback={setEduPlan}/>
+            </div> */}
+            <Popup 
+                trigger={buttonPopup} 
+                setTrigger={setButtonPopup} 
+                parentCallback={setEduPlan}
+                handleState={planState}
+            />
         </NavigationWrapper>
     )
 }

@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react';
 
-const RadioBtn = (props: any ) => {
+const RadioBtn = (props: {name: string, onChange: () => void, value: boolean} ) => {
     return (
         <label>
              <input type="radio" onChange={props.onChange} checked={props.value}/>
@@ -8,28 +8,33 @@ const RadioBtn = (props: any ) => {
     )
 }
 
-export default function Question({parentCallback}: any){
-    const [value, setValue] = useState("normal");
+export default function Question(props: {parentCallback: (planSelected: string) => void, handleState: string}){
+    const [value, setValue] = useState(props.handleState);
 
-    const handleNorChange = () => {
-        setValue("normal");
-        parentCallback("normal");
+    function handleNorChange(): void {
+        setValue("Normal Plan");
+        props.parentCallback("Normal Plan");
     };
 
-    const handleCoopChange = () => {
-        setValue("co-op");
-        parentCallback("co-op");
+    function handleCoopChange(): void {
+        setValue("Cooperative Plan")
+        props.parentCallback("Cooperative Plan"); 
     };
 
     return (
          <Fragment>
              <p>What is your Education Plan ?</p>
              <form method='post'>
-                {/* <RadioBtn label="normal" value={value === "normal"} onChange={handleNorChange}/>Normal Plan<br/>
-                <RadioBtn label="co-op" value={value === "co-op"} onChange={handleCoopChange}/>Co-operative Plan<br/> */}
-                <input type="radio" value="1"name="pet"/>dog
-                <input type="radio" value="2"name="pet"/>cat
-                <input type="radio" value="3"name="pet"/>bird
+                <RadioBtn 
+                    name="Normal Plan"
+                    value={value === "Normal Plan"} 
+                    onChange={handleNorChange}/>
+                <label>Normal Plan<br/></label> 
+                <RadioBtn 
+                    name="Cooperative Plan"
+                    value={value === "Cooperative Plan"} 
+                    onChange={handleCoopChange}/>
+                <label>Cooperative Plan<br/></label>
              </form>
          </Fragment>
     );
