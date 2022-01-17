@@ -1,5 +1,6 @@
-import {Fragment} from 'react';
+import {Fragment, useState} from 'react';
 import {useQuery} from '@apollo/client';
+import '../../styles/catNode.css';
 
 import LeafNode from './LeafNode';
 import {CATNODE_QUERY} from '../queryData';
@@ -9,17 +10,17 @@ import Dropdown_btn from '../Layout/DropdownData';
 
 
 function CatNodeItem(param: {key: any, props: Inf_CatNode, children: JSX.Element}) {
+    const [Toggle, setToggle] = useState(false);
 
     return (
-        <div className="catNode">
-            <div className="row">
-                <div>
-                    <h4>Name : {param.props.name}</h4>
-                    <h4>Credits : {param.props.credits}</h4>
-                </div>
-                <div className="dropdown-btn">
-                    <Dropdown_btn>{ param.children }</Dropdown_btn>
-                </div>
+        <div className="box-page">
+            <div className="row-catNode">
+                <span className="inline-catNode">
+                    <Dropdown_btn onChange={Toggle}>{param.children}</Dropdown_btn>
+                </span>
+                <a className='inline-catNode' onClick={() => setToggle(true)}>
+                    {param.props.name}
+                </a>
             </div>
         </div>
     )

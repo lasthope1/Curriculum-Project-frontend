@@ -1,0 +1,24 @@
+
+.box-page {
+    background-color: gold;
+    width: 100%;
+    height: 40rem;
+    /* text-align: center; */
+}
+
+.row-catNode {
+    position: absolute;
+    display: inline-flex;
+    text-align: center;
+}
+
+.row-catNode:hover {
+    background-color:cyan;
+}
+
+.row-catNode.inline-catNode {
+    display: inline; 
+    width: 100px
+}
+
+

@@ -1,4 +1,22 @@
 
-.dropdown-btn:hover {
-    background-color: #525357;
+.dropdown-btn:hover{
+    /* background-color: grey; */
+}
+
+.dropdown-box {
+    position: absolute;
+    display: block;
+}
+
+.gg-zeit {
+    /* box-sizing: border-box; */
+    position: relative;
+    display: flex;
+    transform: scale(var(--ggs,1));
+    width: 2px;
+    height: 2px;
+
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 18px solid currentColor;
 }
