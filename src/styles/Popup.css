@@ -1,5 +1,5 @@
 
-.popup{
+.popup-bg{
     position: fixed;
     top: 0;
     left: 0;
@@ -11,10 +11,9 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-
 }
 
-.popup-inner{
+.popup-box{
     position: absolute;
     padding: 0px 10px;
     width: 100%;
@@ -25,7 +24,7 @@
     border-radius: 15px;
 }
 
-.popup-inner .save-btn{
+.popup-box .save-btn{
     position: absolute;
     background-color: #30CF50;
     width: 70px;
@@ -40,7 +39,7 @@
     font-size: 17px;
 }
 
-.popup-inner .cancel-btn{
+.popup-box .cancel-btn{
     position: absolute;
     background-color: #F44336;
     width: 70px;
@@ -55,7 +54,7 @@
     font-size: 17px;
 }
 
-.popup-inner .nav-question {
+.popup-box .nav-question {
     width: 102.8%;
     height: 3rem;
     background-color: #9A3CF6;

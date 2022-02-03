@@ -2,16 +2,18 @@ import {gql} from '@apollo/client';
 
 const CATNODE_QUERY = gql`
     query{
-        catNode(id:1){
+        catNode{
+            id
             name
             credits
+            refs
         }
     }
 `;
 
-const LEAFNODE_QUERY = gql`
+const COURSELISTNODE_QUERY = gql`
     query {
-        leafNode{
+        courseListNode{
             id
             name
             courses
@@ -25,8 +27,10 @@ const COURSE_QUERY = gql`
             id
             name
             course_number
+            credit
+            grade
         }
     }
 `
 
-export {CATNODE_QUERY, LEAFNODE_QUERY, COURSE_QUERY};
+export {CATNODE_QUERY, COURSELISTNODE_QUERY, COURSE_QUERY};

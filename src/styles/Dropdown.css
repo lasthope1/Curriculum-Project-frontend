@@ -3,9 +3,9 @@
     /* background-color: grey; */
 }
 
-.dropdown-box {
+.accordion-content {
     position: absolute;
-    display: block;
+    display: inline;
 }
 
 .gg-zeit {
@@ -19,4 +19,8 @@
     border-left: 9px solid transparent;
     border-right: 9px solid transparent;
     border-bottom: 18px solid currentColor;
+}
+
+.rotate{
+    transform: rotate(180deg)
 }

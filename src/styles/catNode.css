@@ -1,24 +1,29 @@
 
-.box-page {
-    background-color: gold;
-    width: 100%;
-    height: 40rem;
-    /* text-align: center; */
+.accordion-catNode {
+    position: relative;
+    width: 50%;
+    height: auto;
+    box-sizing: border-box;
+
+    top: 130px;
+    left: 50px; 
 }
 
-.row-catNode {
-    position: absolute;
+.accordion-catNode-item {
+    position: relative;
+    display: flex;
+    padding: 6px;
+    justify-content: space-between;
+}
+
+.accordion-catNode-item:hover {
+    background-color: #4F4E83;
+    color: white;
+    border-radius: 10px;
+}
+
+.inline-catNode {
+    position: relative;
     display: inline-flex;
-    text-align: center;
+    margin: 0.3rem 5px;
 }
-
-.row-catNode:hover {
-    background-color:cyan;
-}
-
-.row-catNode.inline-catNode {
-    display: inline; 
-    width: 100px
-}
-
-

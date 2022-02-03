@@ -4,18 +4,21 @@ interface Inf_CatNode{
     name: string
     filter: [Inf_Filter]
     credits: number
+    refs:[string]
 }
 
 interface Inf_LeafNode{ 
     id: string
     name: string
-    course: string
+    courses: [string]
 }
 
 interface Inf_Course{
     id: string
     name: string
     course_number: string
+    credit: number
+    grade: string
 }
 
 interface Inf_Filter{

@@ -1,10 +1,8 @@
 
 import './styles/App.css';
 import {ApolloClient, ApolloProvider, InMemoryCache} from '@apollo/client'
-//import LeafNode from './components/Data/LeafNode';
 
-import LeafNode from './components/Data/LeafNode'
-import CatNode from './components/Data/CatNode';
+import Student from './pages/Student';
 import { BrowserRouter as Router, Route, Routes,} from 'react-router-dom'
 
 import NavigationBar from './components/Layout/NavigationBar';
@@ -18,11 +16,10 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Router>
-      <NavigationBar/>
-        <Routes>
-          <Route path="/" element={<CatNode/>}/>
-          <Route path="/leafNode" element={<LeafNode/>}/>
-        </Routes>
+          <Routes>
+            <Route path="/" element={<Student/>}/>
+          </Routes>
+          <NavigationBar/>
       </Router>
     </ApolloProvider>
   )

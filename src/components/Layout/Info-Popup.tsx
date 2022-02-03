@@ -7,7 +7,7 @@ export default function
     Popup(props : {
                     setTrigger: (btnPopup: boolean) => void, 
                     parentCallback: (planSelected: string) => void, 
-                    trigger: boolean, handleState: string
+                    toggle: boolean, handleState: string
                 }
         )
 {
@@ -21,11 +21,12 @@ export default function
     
     const handleCallback = (chileValue: string):string => value = chileValue; 
 
-    return (props.trigger) ? 
-        <div className="popup">
-            <div className="popup-inner">
-                <nav className="nav-question"> <h3 className="question">Question</h3> </nav>
-
+    return (props.toggle) ? 
+        <div className="popup-bg">
+            <div className="popup-box">
+                <nav className="nav-question"> 
+                    <h3 className="question">Question</h3> 
+                </nav>
                 <Question 
                     parentCallback={handleCallback} 
                     handleState={props.handleState}

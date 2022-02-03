@@ -2,32 +2,49 @@ import {Fragment, useState} from 'react';
 import {useQuery} from '@apollo/client';
 import '../../styles/catNode.css';
 
-import LeafNode from './LeafNode';
+import CourseList from './CourseList';
 import {CATNODE_QUERY} from '../queryData';
 import {Inf_CatNode} from '../interfaces/Interfaces';
 
-import Dropdown_btn from '../Layout/DropdownData';
+function RecursiveElement( parentRef: string[], Element: Inf_CatNode): JSX.Element{
+    var isRecursive: boolean = false;
+    for(let i:number = 0; i < parentRef.length; i++){
+        if(parentRef[i] == Element.id){
+            isRecursive = true;
+            break;
+        }
+    }
 
+    return isRecursive ? 
+        <CatNode parentRef={Element.refs}/> : <CourseList parentCatRefs={Element.refs}/>;
+}
 
-function CatNodeItem(param: {key: any, props: Inf_CatNode, children: JSX.Element}) {
+function CatNodeItem(param: {props: Inf_CatNode, children: JSX.Element}) {
     const [Toggle, setToggle] = useState(false);
+    const rotate = Toggle ? "rotate(90deg)":"rotate(0)";
 
     return (
-        <div className="box-page">
-            <div className="row-catNode">
-                <span className="inline-catNode">
-                    <Dropdown_btn onChange={Toggle}>{param.children}</Dropdown_btn>
-                </span>
-                <a className='inline-catNode' onClick={() => setToggle(true)}>
-                    {param.props.name}
-                </a>
+        <>
+            <div className="accordion-catNode-item" onClick={() => setToggle(!Toggle)}>
+                <div className="inline-catNode">
+                    <span>
+                        <i className="gg-play-button" 
+                            style={{transform: rotate, transition:"all 0.2s linear"}}
+                        />
+                    </span>
+                    &nbsp;&nbsp;
+                    <span>{param.props.name}</span>
+                </div>
+                <span className="inline-catNode">{param.props.credits} credits</span> 
             </div>
-        </div>
+            <div>
+                {Toggle && param.children}
+            </div>
+        </>
     )
 }
 
-
-export default function CatNode() {
+export default function CatNode(param:{parentRef: string[], Mode: string[]) {
     const {loading, error, data} = useQuery(CATNODE_QUERY);
         
     if(loading) return <p>Loading...</p> ;
@@ -35,9 +52,15 @@ export default function CatNode() {
 
     return (
         <Fragment>
-            <CatNodeItem key={data.catNode.id} props={data.catNode}>
-                <LeafNode/>
-            </CatNodeItem>
+            <div className="accordion-catNode">
+                { 
+                    data.catNode.map((node: Inf_CatNode) => (
+                        <CatNodeItem key={node.id} props={node}>
+                            {RecursiveElement(param.parentRef, node)}
+                        </CatNodeItem>
+                    ))
+                }
+            </div>
         </Fragment>
     )
 }
