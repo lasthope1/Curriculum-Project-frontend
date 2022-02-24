@@ -1,25 +1,26 @@
-import React from 'react';
+import {useState} from 'react';
 import CatNode from '../components/Data/CatNode';
-import CourseList from '../components/Data/CourseList';
-import Course from '../components/Data/Course';
-import Checkbox from '../components/Layout/Checkbox'
-
+import Checkbox from '../components/Layout/Checkbox';
+import NavigationBar from '../components/Layout/NavigationBar';
 
 export default function Student() {
-  var Selected: string[][] = [];
-
-  function checkboxCallback(modeSelected: boolean): void{
-    let i: number = 0;
-    while(modeSelected){
-      Selected[i][1] = modeSelected;
-      i++
-    }
+  const [Selected, setSelected] = useState(['']); 
+  var mode: string[] = ['Completed', 'InProcess', 'Pending'];
+  
+  function checkboxCallback(modeSelected: string[]): void{
+    setSelected(modeSelected)
+    //showMode(modeSelected)
   }
 
+  // async function showMode(modeSelected: string[]){
+  //   mode = await modeSelected
+  // }
+  
   return (
     <>
       <Checkbox Callback={checkboxCallback}/>
-      <CatNode parentRef={[]} Mode={}/>
+      <CatNode parentRef={[]} modeSelected={Selected}/>
+      <NavigationBar/>
     </>
   )
 }

@@ -6,20 +6,21 @@ import CourseList from './CourseList';
 import {CATNODE_QUERY} from '../queryData';
 import {Inf_CatNode} from '../interfaces/Interfaces';
 
-function RecursiveElement( parentRef: string[], Element: Inf_CatNode): JSX.Element{
+function RecursiveElement( parentRef: string[], Element: Inf_CatNode, modeSelected: string[]): JSX.Element{
     var isRecursive: boolean = false;
     for(let i:number = 0; i < parentRef.length; i++){
-        if(parentRef[i] == Element.id){
+        if(parentRef[i] === Element.id){
             isRecursive = true;
             break;
         }
     }
 
     return isRecursive ? 
-        <CatNode parentRef={Element.refs}/> : <CourseList parentCatRefs={Element.refs}/>;
+        <CatNode parentRef={Element.refs} modeSelected={modeSelected}/> : 
+        <CourseList parentCatRefs={Element.refs} modeSelected={modeSelected}/>;
 }
 
-function CatNodeItem(param: {props: Inf_CatNode, children: JSX.Element}) {
+function CatNodeItem(param: {props: Inf_CatNode, modeSelected: string[] ,children: JSX.Element}) {
     const [Toggle, setToggle] = useState(false);
     const rotate = Toggle ? "rotate(90deg)":"rotate(0)";
 
@@ -44,9 +45,9 @@ function CatNodeItem(param: {props: Inf_CatNode, children: JSX.Element}) {
     )
 }
 
-export default function CatNode(param:{parentRef: string[], Mode: string[]) {
+export default function CatNode(param:{parentRef: string[], modeSelected: string[]}) {
     const {loading, error, data} = useQuery(CATNODE_QUERY);
-        
+
     if(loading) return <p>Loading...</p> ;
     if(error) return <p>{error.message}</p>;
 
@@ -55,8 +56,8 @@ export default function CatNode(param:{parentRef: string[], Mode: string[]) {
             <div className="accordion-catNode">
                 { 
                     data.catNode.map((node: Inf_CatNode) => (
-                        <CatNodeItem key={node.id} props={node}>
-                            {RecursiveElement(param.parentRef, node)}
+                        <CatNodeItem key={node.id} props={node} modeSelected={param.modeSelected}>
+                            {RecursiveElement(param.parentRef, node, param.modeSelected)}
                         </CatNodeItem>
                     ))
                 }

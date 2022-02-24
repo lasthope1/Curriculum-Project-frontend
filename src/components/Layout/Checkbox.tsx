@@ -1,8 +1,13 @@
 
-import {useState} from 'react';
+import {useState}  from 'react';
 import '../../styles/Checkbox.css';
 
-const filterCheckbox: object = {
+type FiltersOption = {
+    filterLists: object[]
+    activeFilter: string[]
+}
+
+const filterCheckbox: FiltersOption = {
     filterLists: [
         {
             name: 'Completed',
@@ -17,91 +22,75 @@ const filterCheckbox: object = {
             value: 'PENDING'
         }
     ],
-    activeFilter: []
+    activeFilter: ['Completed', 'InProcess', 'Pending']
 }
 
-function onFilterChange(filter: string){
-    const {filterLists, activeFilter}: any = filterCheckbox;
-    if (activeFilter.includes(filter)) {
-        const filterIndex = activeFilter.indexOf(filter);
-        const newFilter = [...activeFilter];
-        newFilter.splice(filterIndex, 1);
-        filterCheckbox.setState({ activeFilter: newFilter });
-      } else {
-        filterCheckbox.assign({ activeFilter: [...activeFilter, filter] });
-      }
-}
-
-function CompletedCheckbox(param: {Callback: (isChecked: boolean)=>void}) {
-    const [checkCom, setCheckCom] = useState(true);
-
-    function isCheckCom(){
-
-        setCheckCom(!checkCom)
-
-        if (!checkCom){
-            param.Callback(true)
-        }else{
-            param.Callback(false)
-        }
-    }
+function CompletedCheckbox(param: { isChecked: boolean, onChange: (filter: string ,activeFilterList: string[]) => void }){ 
 
     return (
         <label className='Checkbox-item'>
-            <input type='checkbox' checked={checkCom} onChange={isCheckCom}/>
+            <input type='checkbox' checked={param.isChecked} 
+                onChange={() => param.onChange('Completed',filterCheckbox.activeFilter)}/>
             <a className='Completed'>Completed</a>
         </label>
     )
 }
 
-function InprocessCheckbox(param: {Callback: (isChecked: boolean)=>void}){
-    const [checkInP, setCheckInP] = useState(true);
-
-    function isCheckCom(){
-        setCheckInP(!checkInP)
-        if (!checkInP){
-            param.Callback(true)
-        }else{
-            param.Callback(false)
-        }
-    }
+function InProcessCheckbox(param: { isChecked: boolean, onChange: (filter: string ,activeFilterList: string[]) => void }){
 
     return (
         <label className='Checkbox-item'>
-            <input type='checkbox' checked={checkInP} onChange={isCheckCom}/> 
+            <input type='checkbox' checked={param.isChecked}
+                onChange={() => param.onChange('InProcess', filterCheckbox.activeFilter)}/> 
             <a className='In-process'>In process</a>
         </label>
     )
 }
 
-function PendingCheckbox(param: {Callback: (isChecked: boolean)=>void}){
-    const [checkPend, setCheckPend] = useState(true);
-
-    function isCheckPend(){
-        setCheckPend(!checkPend)
-        if (!checkPend){
-            param.Callback(true)
-        }else{
-            param.Callback(false)
-        }
-    }
+function PendingCheckbox(param: { isChecked: boolean, onChange:(filter: string ,activeFilterList: string[]) => void}){
 
     return (
         <label className='Checkbox-item'>
-            <input type='checkbox' checked={checkPend} onChange={isCheckPend}/> 
+            <input type='checkbox' checked={param.isChecked} 
+                onChange={() => param.onChange('Pending', filterCheckbox.activeFilter)}/> 
             <a className='Pending'>Pending</a>
         </label>
     )
 }
 
-export default function Checkbox(param: {Callback: (isChecked: boolean) => void}) {
+export default function Checkbox(param: {Callback: (activeFilterList: string[]) => void}) {
+
+    param.Callback(filterCheckbox.activeFilter);
+
+    const [checkCom, toggleCom] = useState(true);
+    const [checkInP, toggleInP] = useState(true);
+    const [checkPend, togglePend] = useState(true);
+    
+    function onFilterChange(filter: string, filterList: string[]){
+        //console.log(filterList)
+        if (filterList.includes(filter)) {
+            const filterIndex = filterList.indexOf(filter);
+            //console.log(filterIndex)
+            filterCheckbox.activeFilter.splice(filterIndex, 1);
+        } else {
+            filterCheckbox.activeFilter = [...filterList, filter];
+        }
+
+        if (filter === 'Completed'){
+            toggleCom(filterCheckbox.activeFilter.includes(filter));
+        }else if(filter === 'InProcess'){
+            toggleInP(filterCheckbox.activeFilter.includes(filter));
+        }else{
+            togglePend(filterCheckbox.activeFilter.includes(filter));
+        }
+    }
 
   return (
     <>
         <div className='Checkbox'>
-            <CompletedCheckbox Callback={param.Callback}/>
-            <InprocessCheckbox Callback={param.Callback}/>
-            <PendingCheckbox Callback={param.Callback}/>
+            <CompletedCheckbox isChecked={checkCom} onChange={onFilterChange}/>
+            <InProcessCheckbox isChecked={checkInP} onChange={onFilterChange}/>
+            <PendingCheckbox isChecked={checkPend} onChange={onFilterChange}/>
         </div>
     </>
   );

@@ -19,7 +19,6 @@ function App() {
           <Routes>
             <Route path="/" element={<Student/>}/>
           </Routes>
-          <NavigationBar/>
       </Router>
     </ApolloProvider>
   )
