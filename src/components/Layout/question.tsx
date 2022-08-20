@@ -1,42 +1,46 @@
-import { Fragment, useState } from 'react';
+import React, { useState } from 'react';
+import {useQuery} from '@apollo/client';
+import {StudentQuestion_QUERY} from '../queryGraphQL/queryQuestion';
 
-const RadioBtn = (props: {name: string, onChange: () => void, value: boolean} ) => {
-    return (
-        <label>
-             <input type="radio" onChange={props.onChange} checked={props.value}/>
-        </label>
-    )
-}
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 
 export default function Question(props: {parentCallback: (planSelected: string) => void, handleState: string}){
     const [value, setValue] = useState(props.handleState);
+    const {loading, error, data} = useQuery(StudentQuestion_QUERY);
 
-    function handleNorChange(): void {
-        setValue("Normal Plan");
-        props.parentCallback("Normal Plan");
-    };
+    if (loading) {
+        return <div>loading...</div>
+    }
 
-    function handleCoopChange(): void {
-        setValue("Cooperative Plan")
-        props.parentCallback("Cooperative Plan"); 
+    if (error) {
+        return <div>fail to fetch, Sorry...</div> 
+    }
+
+    function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        setValue((event.target as HTMLInputElement).value);
+        props.parentCallback((event.target as HTMLInputElement).value)
     };
 
     return (
-         <Fragment>
-             <p>What is your Education Plan ?</p>
-             <form method='post'>
-                <RadioBtn 
-                    name="Normal Plan"
-                    value={value === "Normal Plan"} 
-                    onChange={handleNorChange}/>
-                <label>Normal Plan<br/></label> 
-                <RadioBtn 
-                    name="Cooperative Plan"
-                    value={value === "Cooperative Plan"} 
-                    onChange={handleCoopChange}/>
-                <label>Cooperative Plan<br/></label>
-             </form>
-         </Fragment>
+         <FormControl>
+             <FormLabel>{data.question.question}</FormLabel>
+             <RadioGroup
+                name='Plan'
+                defaultValue="female"
+                value={value}
+                onChange={handleChange} 
+             >
+                {
+                    data.question.choice.map((choice: String, index: number) => (
+                        <FormControlLabel key={index.toString()} value={choice} control={<Radio />} label={choice} />
+                    ))
+                }
+             </RadioGroup>
+         </FormControl>
     );
 }
 
