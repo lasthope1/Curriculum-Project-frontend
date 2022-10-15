@@ -1,34 +1,28 @@
 
 interface Inf_CatNode{
-    // id: string 
-    // name: string
-    // filter: Inf_Filter[]
-    // credits: number
-    // refs:string[]
     id: string
     name: string
     refCat: Inf_CatNode[]
     refList: Inf_CourseList[]
-    refCourse: Inf_Course[]
-    kind: 'CatNode'
+    credit: number
 }
 
 interface Inf_CourseList{ 
     id: string
     name: string
     courses: Inf_Course[]
-    kind: 'CourseList'
+    credit: number
+    newCredit: number
+    status?: string
 }
 
 interface Inf_Course{
-    // id: string
-    // name: string
-    // course_number: string
-    // credit: number
-    // grade: string
     id: string
     name: string
-    kind: 'Course'
+    COURSENO: string
+    credit: number
+    grade?: string
+    status?: string
 }
 
 interface Inf_Filter{
@@ -41,6 +35,7 @@ interface Inf_Question{
     id: string
     question: string
     choices: string[]
+    answer: string
 }
 
 export type {Inf_CatNode, Inf_CourseList, Inf_Course, Inf_Filter, Inf_Question}

@@ -25,43 +25,48 @@ const filterCheckbox: FiltersOption = {
             value: 'PENDING'
         }
     ],
-    activeFilter: ['Completed', 'InProcess', 'Pending']
+    activeFilter: ['completed', 'inprocess', 'pending']
 }
-
-function CompletedCheckbox(param: { isChecked: boolean, onChange: (filter: string ,activeFilterList: string[]) => void }){ 
+// mapM in hs
+function CompletedCheckbox(param: { isChecked: boolean, 
+    onChange: (filter: string ,activeFilterList: string[]) => void }){ 
 
     return (
         <label className='Checkbox-item'>
             <input type='checkbox' checked={param.isChecked} 
-                onChange={() => param.onChange('Completed',filterCheckbox.activeFilter)}/>
+                onChange={() => param.onChange('completed',filterCheckbox.activeFilter)}/>
             <span className='Completed'>Completed</span>
         </label>
     )
 }
 
-function InProcessCheckbox(param: { isChecked: boolean, onChange: (filter: string ,activeFilterList: string[]) => void }){
+function InProcessCheckbox(param: { isChecked: boolean, 
+    onChange: (filter: string ,activeFilterList: string[]) => void }){
 
     return (
         <label className='Checkbox-item'>
             <input type='checkbox' checked={param.isChecked}
-                onChange={() => param.onChange('InProcess', filterCheckbox.activeFilter)}/> 
+                onChange={() => param.onChange('inprocess', filterCheckbox.activeFilter)}/> 
             <span className='In-process'>In process</span>
         </label>
     )
 }
 
-function PendingCheckbox(param: { isChecked: boolean, onChange:(filter: string ,activeFilterList: string[]) => void}){
+function PendingCheckbox(param: { isChecked: boolean, 
+    onChange:(filter: string ,activeFilterList: string[]) => void}){
 
     return (
         <label className='Checkbox-item'>
             <input type='checkbox' checked={param.isChecked} 
-                onChange={() => param.onChange('Pending', filterCheckbox.activeFilter)}/> 
+                onChange={() => param.onChange('pending', filterCheckbox.activeFilter)}/> 
             <span className='Pending'>Pending</span>
         </label>
     )
 }
 
-export default function Checkbox(param: {Callback: (activeFilterList: string[]) => void}) {
+
+// --> Main function component <--
+function Checkbox(param: {Callback: (activeFilterList: string[]) => void}) {
 
     const [checkCom, toggleCom] = useState(true);
     const [checkInP, toggleInP] = useState(true);
@@ -75,9 +80,9 @@ export default function Checkbox(param: {Callback: (activeFilterList: string[]) 
             filterCheckbox.activeFilter = [...filterList, filter];
         }
         
-        if (filter === 'Completed'){
+        if (filter === 'completed'){
             toggleCom(filterCheckbox.activeFilter.includes(filter));
-        }else if(filter === 'InProcess'){
+        }else if(filter === 'inprocess'){
             toggleInP(filterCheckbox.activeFilter.includes(filter));
         }else{
             togglePend(filterCheckbox.activeFilter.includes(filter));
@@ -96,3 +101,5 @@ export default function Checkbox(param: {Callback: (activeFilterList: string[]) 
     </>
   );
 }
+
+export default Checkbox;

@@ -1,7 +1,10 @@
 import {useState, useEffect} from 'react';
-import {useQuery} from '@apollo/client';
-import {StudentData_QUERY} from '../queryGraphQL/queryData';
+import {useQuery, useLazyQuery} from '@apollo/client';
 
+// Queries and Mutations 
+import {ADMIN_DATA_QUERY} from '../query/queryData';
+
+// Components
 import TreeView from '@mui/lab/TreeView';
 import TreeItem from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -12,7 +15,11 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import IconButton from '@mui/material/IconButton';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+// import { MuiDraggableTreeView, TreeNode } from "@mui/lab/TreeV";
 
+// Icons
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
@@ -20,7 +27,14 @@ import DifferenceOutlinedIcon from '@mui/icons-material/DifferenceOutlined';
 import AllInboxOutlinedIcon from '@mui/icons-material/AllInboxOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
+// Interfaces
 import {Inf_CatNode, Inf_CourseList, Inf_Course} from '../interfaces/Interfaces';
+import {Inf_CurriData} from '../interfaces/InfOther';
+
+//Function helpers
+import {instanceOfCat, instanceOfCL} from '../../functions/InstanceOfNodes';
+
+type NodeType = Inf_CatNode | Inf_CourseList | Inf_Course;
 
 // function handleDoubleClick(event: React.MouseEvent<HTMLElement> , Target: any) {
 //     event.preventDefault();
@@ -40,26 +54,33 @@ import {Inf_CatNode, Inf_CourseList, Inf_Course} from '../interfaces/Interfaces'
 
 // function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
 //     setNameChanged(event.target.value);
-// }
+// } 
 
-function instanceOfCat(unktNode: Inf_CatNode | Inf_CourseList | Inf_Course): unktNode is Inf_CatNode {
-    return 'refList' in unktNode
-}
+function dataLabel(node: Inf_CatNode | Inf_CourseList | Inf_Course , 
+                    isEditMode: boolean, 
+                    addCat_callBack: () => void,
+                    addCourse_callBack: (node: Inf_CatNode | Inf_CourseList) => void,
+                    hasListChildren: boolean,
+                    elementKey: number){
 
-function instanceOfCL(unktNode: Inf_CatNode | Inf_CourseList | Inf_Course): unktNode is Inf_CourseList {
-    return 'courses' in unktNode
-} 
+    const addCatChild = () => {
+        addCat_callBack()
+    }
 
-function labelData(node: Inf_CatNode | Inf_CourseList | Inf_Course , isEditMode: boolean) {
+    const addCourse = () => {
+        if(instanceOfCat(node) || instanceOfCL(node)){
+            addCourse_callBack(node)
+        }
+    }
 
-    const typeCheck = (isCat: boolean, isCourseList: boolean) => {
-        if(isCat || isCourseList){
+    const typeCheck = () => {
+        if(instanceOfCat(node) || instanceOfCL(node)){
             return (
                 <Box sx={{display: 'flex', '& hr': {mx: 1.5, height: 'auto'}}}>
-                    <IconButton size='small' color='primary' sx={{mx: 1}}>
+                    <IconButton size='small' color='primary' sx={{mx: 1}} onClick={addCatChild} disabled={instanceOfCL(node)}>
                         <CreateNewFolderOutlinedIcon fontSize="inherit"/>
                     </IconButton>
-                    <IconButton size='small' color='primary' sx={{mx: 1}}>
+                    <IconButton size='small' color='primary' sx={{mx: 1}} onClick={addCourse} disabled={hasListChildren}>
                         <NoteAddOutlinedIcon fontSize="inherit"/>
                     </IconButton>
                     <Divider orientation='vertical' flexItem />
@@ -67,67 +88,170 @@ function labelData(node: Inf_CatNode | Inf_CourseList | Inf_Course , isEditMode:
                         <DeleteOutlinedIcon fontSize='inherit'/>
                     </IconButton>
                 </Box>
-                )
-        }else {
+            )
+        }else{
             return (
-                <IconButton size='small' color='error' sx={{mx: 1}}>
-                    <DeleteOutlinedIcon fontSize="inherit"/>
-                </IconButton>
+                <Box sx={{display: 'flex', '& hr': {mx: 1.5, height: 'auto'}}}>
+                    <IconButton size='small' color='error' sx={{mx: 1}}>
+                        <DeleteOutlinedIcon fontSize="inherit"/>
+                    </IconButton>
+                </Box>
             )
         }
     }
 
+    if(instanceOfCat(node) || instanceOfCL(node)){
+        return (
+            <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                <Box>
+                    <span>{node.name}</span>
+                    {/* <span>{node.credit}</span> */}
+                </Box>
+                { (isEditMode) ? typeCheck() : <span>{node.credit}</span> }
+            </Box>
+        )
+    }
+
     return (
         <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-            <span style={{paddingRight: '0.5rem'}}>{node.name}</span>
-            { isEditMode && typeCheck(instanceOfCat(node), instanceOfCL(node)) }
+            <Box>
+                <span style={{paddingRight: '1.5rem'}}>{node.COURSENO}</span>
+                <span style={{paddingRight: '0.5rem'}}>{node.name}</span>
+            </Box>
+            { (isEditMode) ? typeCheck() : <span>{node.credit}</span> }
         </Box>
     )
 }
 
-function RecursiveElement(param: { CatElement: Inf_CatNode[] , 
-                                ListElement: Inf_CourseList[], 
-                                CourseElement: Inf_Course[], 
-                                isEditMode: boolean }): JSX.Element{
+function RecursiveElement(param: { nodeElement: NodeType,
+                elementKey: number, 
+                isEditMode: boolean 
+        }): JSX.Element {
+
+        const [childrenCat, setChildrenCat] = useState<Array<Inf_CatNode>>([])
+        const [childrenCat_list, setChildrenCat_list] = useState<Array<Inf_CourseList>>([])
+        const [childrenList, setChildrenList] = useState<Array<Inf_Course>>([])
+        const [hasListChildren, setHasListChildren] = useState<boolean>(false)
+
+        async function setData(){
+            if(instanceOfCat(param.nodeElement)){
+                await setChildrenCat(param.nodeElement.refCat);
+                await setChildrenCat_list(param.nodeElement.refList);
+                await setHasListChildren(param.nodeElement.refList.length === 0)
+            }else if(instanceOfCL(param.nodeElement)){
+                await setChildrenList(param.nodeElement.courses);
+            }
+        }
+
+        useEffect(() => {
+            setData()
+        }, [param.nodeElement])
+
+        const addChild = (): void => {
+            setChildrenCat((prevState: Inf_CatNode[]) => [
+                ...prevState, {
+                    id: Math.floor(Math.random() * 100).toString(),
+                    name: 'New catagory node',
+                    refCat: [],
+                    refList: [],
+                    credit: 0
+                }
+            ])
+        }
+
+        const addCourse = (node: Inf_CatNode | Inf_CourseList) => {
+            if(instanceOfCat(node) && childrenCat_list.length === 0){
+                setChildrenCat((prevState: Inf_CatNode[]) => [
+                    ...prevState, {
+                        id: Math.floor(Math.random() * 100).toString(),
+                        name: 'New catagory node',
+                        refCat: [],
+                        refList: [],
+                        credit: 0,
+                    }
+                ])
+            }else{
+                setChildrenList((prevState: Inf_Course[]) => [
+                    ...prevState, {
+                        id: Math.floor(Math.random() * 100).toString(),
+                        name: 'New course',
+                        COURSENO: Math.floor(Math.random() * 100).toString(),
+                        credit: 0
+                    }
+                ])
+            }
+        }
+
     return (
         <>
             {
-                param.CatElement.map((node: Inf_CatNode, index: number) => 
-                    <TreeItem key={index} nodeId={node.id} label={labelData(node, param.isEditMode)}>
-                        <RecursiveElement CatElement={node.refCat} 
-                            ListElement={node.refList} 
-                            CourseElement={node.refCourse} 
-                            isEditMode={param.isEditMode}/>
-                    </TreeItem>
-                )
-            }
-            {
-                param.ListElement.map((node: Inf_CourseList, index: number) => 
-                    <TreeItem key={index} nodeId={node.id} label={labelData(node, param.isEditMode)}>
-                        <RecursiveElement CatElement={[]} 
-                            ListElement={[]} 
-                            CourseElement={node.courses} 
-                            isEditMode={param.isEditMode}/>
-                    </TreeItem>
-                )
-            }
-            {
-                param.CourseElement.map((node: Inf_Course, index: number) => 
-                    <TreeItem key={index} nodeId={node.id} label={labelData(node, param.isEditMode)}></TreeItem>
-                )
+                (instanceOfCat(param.nodeElement) || instanceOfCL(param.nodeElement)) ?
+                    <TreeItem key={param.elementKey} nodeId={param.nodeElement.id} 
+                        label={dataLabel(param.nodeElement, 
+                                param.isEditMode, 
+                                addChild, 
+                                addCourse, 
+                                hasListChildren,
+                                param.elementKey
+                            )}>
+                        {
+                            childrenCat?.map((node: Inf_CatNode, index: number) => 
+                                <RecursiveElement nodeElement={node} 
+                                    elementKey={index}
+                                    isEditMode={param.isEditMode}/>
+                                )
+                        }
+                        {
+                            childrenCat_list?.map((node: Inf_CourseList, index: number) => 
+                                <RecursiveElement nodeElement={node} 
+                                    elementKey={index} 
+                                    isEditMode={param.isEditMode}/>
+                            )
+                        }
+                        {
+                            childrenList?.map((node: Inf_Course, index: number) => 
+                                <RecursiveElement nodeElement={node} 
+                                    elementKey={index}
+                                    isEditMode={param.isEditMode}/>
+                            )
+                        }
+                    </TreeItem> : 
+                    <TreeItem key={param.elementKey} nodeId={param.nodeElement.id} 
+                        label={dataLabel(param.nodeElement, 
+                                    param.isEditMode, 
+                                    addChild, 
+                                    addCourse, 
+                                    hasListChildren,
+                                    param.elementKey
+                                )} />
             }
         </>
     )
 }
 
-export default function TreeViewAdmin(prop: {CurrTarget: string}) {
-    const [expanded, setExpanded] = useState<string[]>([]);
-    const {loading, error, data} = useQuery(StudentData_QUERY);
-    const [toggleMode, setToggleEditMode] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     console.log(toggleMode)
-    // }, [toggleMode])
+// --> Main function component <-- 
+function AdminTreeView(prop: {CurrTarget: string}) {
+    const [fetchData,{loading, error}] = useLazyQuery(ADMIN_DATA_QUERY);
+
+    const [expanded, setExpanded] = useState<string[]>([]);
+    const [toggleMode, setToggleEditMode] = useState<boolean>(false);
+    const [curriData, setCurriData] = useState<Inf_CurriData>({
+        id: '',
+        name: '',
+        cat: []
+    })
+
+    useEffect(() => {
+
+        const fetchCurriData = async() => {
+            const res = await fetchData();
+            const data : Inf_CurriData = res.data.aCur;
+            setCurriData(data)
+        }
+
+        fetchCurriData()
+    }, [])
     
     if(loading){
         return <p>Loading...</p>
@@ -141,20 +265,35 @@ export default function TreeViewAdmin(prop: {CurrTarget: string}) {
         setExpanded(nodeIds);
     };
 
+    function handleAddRootCat(){
+        setCurriData((prevState: Inf_CurriData) => (
+            { 
+                ...prevState, 
+                cat : [ ...prevState.cat , {
+                    id: Math.floor(Math.random() * 100).toString(),
+                    name: 'New catagory node',
+                    refCat: [],
+                    refList: [],
+                    credit: 0
+                }]
+            }
+        ));
+    }
+
     async function handleExpandClick() {
         var acc: string[] = [];
-        const findSub = (node: Inf_CatNode | Inf_CourseList) => {
+        const findSub = async(node: Inf_CatNode | Inf_CourseList) => {
             if(instanceOfCat(node)) {
                 acc.push(node.id)
-                node.refCat.map((subNode: Inf_CatNode) => findSub(subNode))
-                node.refList.map((sublistNode: Inf_CourseList) => findSub(sublistNode))
+                await node.refCat.map((subNode: Inf_CatNode) => findSub(subNode))
+                await node.refList.map((sublistNode: Inf_CourseList) => findSub(sublistNode))
             }else{
                 acc.push(node.id)
             }
         }
 
-        if (expanded.length === 0) {
-            await data.cat.refCat.map((node: Inf_CatNode) => {
+        if (typeof curriData.cat !== 'undefined' && expanded.length === 0) {
+            await curriData.cat.map((node: Inf_CatNode) => {
                 findSub(node)
             })
         }
@@ -185,23 +324,20 @@ export default function TreeViewAdmin(prop: {CurrTarget: string}) {
                     expanded={expanded}
                     onNodeToggle={handleToggle}
                     // sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-                    sx={{width: '100%', height: 'auto'}}
+                    sx={{ width: '100%', height: 700, flexGrow: 1, overflowY: 'auto' }}
                     multiSelect >
                     {
-                        data.cat.refCat.map((node: Inf_CatNode, index: number) => (
-                            <TreeItem key={index} nodeId={node.id} label={labelData(node, toggleMode)}>
-                                <RecursiveElement CatElement={node.refCat} 
-                                    ListElement={node.refList} 
-                                    CourseElement={node.refCourse}
-                                    isEditMode={toggleMode}/>
-                            </TreeItem>
-                        ))
+                        curriData.cat?.map((node: Inf_CatNode, index: number) => 
+                            <RecursiveElement nodeElement={node} 
+                                elementKey={index}
+                                isEditMode={toggleMode}/>
+                        )
                     }
                 </TreeView>
             </Box>
-            {   toggleMode &&
+            { toggleMode &&
                 <Box sx={{mt: 1, display: 'flex', width: '100%', justifyContent: 'center'}}>
-                    <IconButton size='large' color='primary'>
+                    <IconButton size='large' color='primary' onClick={handleAddRootCat}>
                         <AddCircleOutlineOutlinedIcon fontSize="inherit"/>
                     </IconButton>
                 </Box>
@@ -210,155 +346,130 @@ export default function TreeViewAdmin(prop: {CurrTarget: string}) {
     )
 }
 
-interface CurriData {
-    id: string
-    name: string
-    refCat: Inf_CatNode[]
-} 
+export default AdminTreeView ;
 
-const curriData: CurriData = {
-    id: 'CPE58',
-    name: 'Computer Engineering 58',
-    refCat: [
-        {
-            id: 'GE01',
-            name: 'General Education',
-            kind: 'CatNode',
-            refCat: [],
-            refList: [
-                {
-                    id: 'Lang02',
-                    name: 'Language and Community',
-                    kind: 'CourseList',
-                    courses: [
-                        {
-                            id: 'Engl1',
-                            name: 'English 1',
-                            kind: 'Course'
-                        },
-                        {
-                            id: 'Engl2',
-                            name: 'English 2',
-                            kind: 'Course'
-                        },
-                        {
-                            id: 'Engl3',
-                            name: 'English 3',
-                            kind: 'Course',
-                        },
-                        {
-                            id: 'Engl4',
-                            name: 'English 4',
-                            kind: 'Course'
-                        },
-                    ]
-                },
-                {
-                    id: 'Learn02',
-                    name: 'Learning thought activities',
-                    kind: 'CourseList',
-                    courses: [
-                        {
-                            id: '191',
-                            name: 'The killer',
-                            kind: 'Course'
-                        },
-                        {
-                            id: '192',
-                            name: 'The killer 2',
-                            kind: 'Course'
-                        },
-                        {
-                            id: '194',
-                            name: 'Chill subject',
-                            kind: 'Course'
-                        }
-                    ]
-                }
-            ],
-            refCourse: []
-        },
-        {
-            id: 'FS01',
-            name: 'Field of spacialization',
-            kind: 'CatNode',
-            refCat: [
-                {
-                    id: 'Maj02',
-                    name: 'Major',
-                    kind: 'CatNode',
-                    refCat: [
-                        {
-                            id: 'MajReq',
-                            name: 'Major requirements',
-                            kind: 'CatNode',
-                            refCat: [],
-                            refList: [
-                                {
-                                    id: 'Nor58',
-                                    name: 'Normal',
-                                    kind: 'CourseList',
-                                    courses: []
-                                }
-                            ],
-                            refCourse: []
-                        },
-                        {
-                            id: 'MajEle',
-                            name: 'Major electives',
-                            kind: 'CatNode',
-                            refCat: [],
-                            refList: [
-                                {
-                                    id: 'NorEle58',
-                                    name: 'Normal Election',
-                                    kind: 'CourseList',
-                                    courses: []
-                                },
-                                {
-                                    id: 'Coop58',
-                                    name: 'Co-opertion Election',
-                                    kind: 'CourseList',
-                                    courses: []
-                                }
-                            ],
-                            refCourse: []
-                        },
-                    ],
-                    refList: [],
-                    refCourse: []
-                }
-            ],
-            refList: [
-                {
-                    id: 'CC02',
-                    name: 'CoreCourse',
-                    kind: 'CourseList',
-                    courses: [
-                        {
-                            id: 'Engl1',
-                            name: 'English 1',
-                            kind: 'Course'
-                        },
-                        {
-                            id: 'Engl2',
-                            name: 'English 2',
-                            kind: 'Course'
-                        },
-                        {
-                            id: 'Engl3',
-                            name: 'English 3',
-                            kind: 'Course',
-                        },
-                        {
-                            id: 'Engl4',
-                            name: 'English 4',
-                            kind: 'Course'
-                        },
-                    ] 
-                }
-            ],
-            refCourse: []
-        }
-    ]
-}
+
+// const curriData: Inf_CurriData = {
+//     id: 'CPE58',
+//     name: 'Computer Engineering 58',
+//     refCat: [
+//         {
+//             id: 'GE01',
+//             name: 'General Education',
+//             refCat: [],
+//             refList: [
+//                 {
+//                     id: 'Lang02',
+//                     name: 'Language and Community',
+//                     courses: [
+//                         {
+//                             id: 'Engl1',
+//                             name: 'English 1',
+//                         },
+//                         {
+//                             id: 'Engl2',
+//                             name: 'English 2',
+//                         },
+//                         {
+//                             id: 'Engl3',
+//                             name: 'English 3',
+//                         },
+//                         {
+//                             id: 'Engl4',
+//                             name: 'English 4',
+//                         },
+//                     ]
+//                 },
+//                 {
+//                     id: 'Learn02',
+//                     name: 'Learning thought activities',
+//                     courses: [
+//                         {
+//                             id: '191',
+//                             name: 'The killer',
+//                         },
+//                         {
+//                             id: '192',
+//                             name: 'The killer 2',
+//                         },
+//                         {
+//                             id: '194',
+//                             name: 'Chill subject',
+//                         }
+//                     ]
+//                 }
+//             ],
+//             refCourse: []
+//         },
+//         {
+//             id: 'FS01',
+//             name: 'Field of spacialization',
+//             refCat: [
+//                 {
+//                     id: 'Maj02',
+//                     name: 'Major',
+//                     refCat: [
+//                         {
+//                             id: 'MajReq',
+//                             name: 'Major requirements',
+//                             refCat: [],
+//                             refList: [
+//                                 {
+//                                     id: 'Nor58',
+//                                     name: 'Normal',
+//                                     courses: []
+//                                 }
+//                             ],
+//                             refCourse: []
+//                         },
+//                         {
+//                             id: 'MajEle',
+//                             name: 'Major electives',
+//                             refCat: [],
+//                             refList: [
+//                                 {
+//                                     id: 'NorEle58',
+//                                     name: 'Normal Election',
+//                                     courses: []
+//                                 },
+//                                 {
+//                                     id: 'Coop58',
+//                                     name: 'Co-opertion Election',
+//                                     courses: []
+//                                 }
+//                             ],
+//                             refCourse: []
+//                         },
+//                     ],
+//                     refList: [],
+//                     refCourse: []
+//                 }
+//             ],
+//             refList: [
+//                 {
+//                     id: 'CC02',
+//                     name: 'CoreCourse',
+//                     courses: [
+//                         {
+//                             id: 'Engl1',
+//                             name: 'English 1',
+//                         },
+//                         {
+//                             id: 'Engl2',
+//                             name: 'English 2',
+//                         },
+//                         {
+//                             id: 'Engl3',
+//                             name: 'English 3',
+//                         },
+//                         {
+//                             id: 'Engl4',
+//                             name: 'English 4',
+//                         },
+//                     ] 
+//                 }
+//             ],
+//             refCourse: []
+//         }
+//     ]
+// }

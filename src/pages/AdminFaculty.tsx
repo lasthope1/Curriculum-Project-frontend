@@ -1,22 +1,15 @@
 import {useEffect, useState} from 'react';
-import {Button, Card, Container, Row, Col, Navbar, Nav, Form, FormControl} from 'react-bootstrap';
 import styled from 'styled-components';
+
+// Components
+import {default as TreeVA} from '../components/Layout/TreeViewAdmin';
+import {Button, Card, Container, Row, Col, Navbar, Nav, Form, FormControl} from 'react-bootstrap';
 import Divider from '@mui/material/Divider';
 import Box from '@mui/material/Box';
 
-import {default as TreeVA} from '../components/Layout/TreeViewAdmin';
+// Interfaces
+import {Inf_CurriData} from '../components/interfaces/InfOther';
 
-interface CurriData {
-  id: string
-  name: string
-  CatList: CatNodeData[]
-}
-
-interface CatNodeData {
-  id: string
-  name: string
-  parentsID?: string
-}
 
 const StyledComp = styled.div`
     .navbar {
@@ -39,47 +32,47 @@ const StyledComp = styled.div`
 
 function AdminFaculty() {
   const [targetID, setTargetID] = useState<string>('');
-  const [Curri, setCurri] = useState(Array<CurriData>());
+  const [Curri, setCurri] = useState<Array<Inf_CurriData>>(CurriDataTest);
   const [toggleEditMode, setEditMode] = useState<boolean>(false);
 
   // const changeModeHandler = () => {
   //   setEditMode(!toggleEditMode)
   // }
 
-  function getLocalCurriData() {
-   if(localStorage.getItem('Curri') === null) {
-      localStorage.setItem('Curri', JSON.stringify([]));
-    }else{
-      const getCurr: string | null = localStorage.getItem('Curri');  // Type of getFac always will be a string 
-      const CurriDatas: CurriData[] = (typeof getCurr === 'string') ? 
-        ( typeof JSON.parse(getCurr) === 'number' ||
-          typeof JSON.parse(getCurr) === 'string' ||
-          typeof JSON.parse(getCurr) === 'boolean'
-        ) ? [] : JSON.parse(getCurr) 
-      : alert('Please refresh your web page');
+  // function getLocalCurriData() {
+  //  if(localStorage.getItem('Curri') === null) {
+  //     localStorage.setItem('Curri', JSON.stringify([]));
+  //   }else{
+  //     const getCurr: string | null = localStorage.getItem('Curri');  // Type of getFac always will be a string 
+  //     const CurriDatas: CurriData[] = (typeof getCurr === 'string') ? 
+  //       ( typeof JSON.parse(getCurr) === 'number' ||
+  //         typeof JSON.parse(getCurr) === 'string' ||
+  //         typeof JSON.parse(getCurr) === 'boolean'
+  //       ) ? [] : JSON.parse(getCurr) 
+  //     : alert('Please refresh your web page');
 
-      if(CurriDatas.length > 0) {
-        setCurri(CurriDatas);
-        //setTargetID(CurriDatas[0].id)
-      }
-    }
-  }
+  //     if(CurriDatas.length > 0) {
+  //       setCurri(CurriDatas);
+  //       //setTargetID(CurriDatas[0].id)
+  //     }
+  //   }
+  // }
   
-  function setLocalCurriData() {
-    if(localStorage.getItem('Curri') === null) {
-      localStorage.setItem('Curri', JSON.stringify([]));
-    }else{
-      localStorage.setItem('Curri', JSON.stringify(Curri));
-    }
-  }
+  // function setLocalCurriData() {
+  //   if(localStorage.getItem('Curri') === null) {
+  //     localStorage.setItem('Curri', JSON.stringify([]));
+  //   }else{
+  //     localStorage.setItem('Curri', JSON.stringify(Curri));
+  //   }
+  // }
 
-  useEffect(() => {
-    getLocalCurriData();
-  }, [])
+  // useEffect(() => {
+  //   getLocalCurriData();
+  // }, [])
 
-  useEffect(() => {
-    setLocalCurriData();
-  }, [Curri])
+  // useEffect(() => {
+  //   setLocalCurriData();
+  // }, [Curri])
 
   function createCurriHandler() {
     var randomID: string = Math.floor(Math.random() * 100).toString();
@@ -87,21 +80,27 @@ function AdminFaculty() {
       {
         id: randomID,
         name: 'New curriculum',
-        CatList: [
+        cat: [
           { 
             id: Math.floor(Math.random() * 100).toString(),
             name:'General Education', 
-            parentsID: randomID
+            refCat: [],
+            refList: [],
+            credit: 0
           },
           {
             id: Math.floor(Math.random() * 100).toString(),
-            name: 'Field of Specialization', 
-            parentsID: randomID
+            name: 'Field of Specialization',
+            refCat: [],
+            refList: [],
+            credit: 0
           },
           {
             id: Math.floor(Math.random() * 100).toString(), 
             name: 'Free Elective',
-            parentsID: randomID
+            refCat: [],
+            refList: [],
+            credit: 0
           }]
       }
     ])
@@ -109,7 +108,7 @@ function AdminFaculty() {
   }
 
   function deleteCurriHander(CurrID: string): void {
-    setCurri([...Curri.filter((curr: CurriData) => curr.id !== CurrID)])
+    setCurri([...Curri.filter((curr: Inf_CurriData) => curr.id !== CurrID)])
   }
 
   return (
@@ -133,18 +132,17 @@ function AdminFaculty() {
             </Container>
           </Navbar>
         </StyledComp>
-
         <Container style={{padding: 20, display: 'flex', width: '100%'}} fluid>
           <Box sx={{width: '30%', height: 'auto'}}>
             <Button className='text-light' 
-                variant='primary' size='lg'
-                onClick={createCurriHandler}
-                style={{borderRadius: 25, fontWeight: '2rem'}}>
-                Add curriculum
+                    variant='primary' size='lg'
+                    onClick={createCurriHandler}
+                    style={{borderRadius: 25, fontWeight: '2rem'}}>
+              Add curriculum
             </Button>
             <Col style={{ margin: 10, width: '100%'}}>
               {
-                Curri.map((curri: CurriData, index: number) => (
+                Curri.map((curri: Inf_CurriData, index: number) => (
                   <Row md={4} key={index}>
                     <Card onClick={() => setTargetID(curri.id)}
                       bg='secondary' 
@@ -165,7 +163,7 @@ function AdminFaculty() {
               }
             </Col>
           </Box>
-          <Box sx={{display: 'flex', '& hr': {mx: 1.5, height: '100%'}, ml: 4}}>
+          <Box sx={{display: 'flex', '& hr': {mx: 1.5, height: '100%', background: 'black'}, ml: 4}}>
             <Divider orientation='vertical' flexItem />
           </Box>
           <Box sx={{width: '60%', height: 'auto', ml: 7}}>
@@ -177,3 +175,17 @@ function AdminFaculty() {
 }
 
 export default AdminFaculty
+
+
+const CurriDataTest : Inf_CurriData[] = [
+  {
+    id: 'CPE58',
+    name: 'CPE 2558',
+    cat: []
+  },
+  {
+    id: 'CPE63',
+    name: 'CPE 2563',
+    cat: []
+  }
+]

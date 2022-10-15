@@ -1,11 +1,15 @@
 
 import {useState} from 'react';
-import {Button, Container, Navbar, Nav, Form, FormControl} from 'react-bootstrap';
 import styled from 'styled-components';
+// import AuthContext from '../context/authContext';
 
-import {FacultyData, MajorData} from '../components/interfaces/InfOther';
+//Components
+import {Button, Container, Navbar, Nav, Form, FormControl} from 'react-bootstrap';
 import {FacultyCard} from '.././components/Layout/FacultyCard';
-import AlertForm from '.././components/Layout/FacultyAlertForm';
+import AddForm from '../components/Layout/FacultyAddForm';
+
+// Interfaces
+import {Inf_FacultyData, Inf_MajorData} from '../components/interfaces/InfOther';
 
 const NavStyled = styled.nav`
   .navbar {
@@ -28,9 +32,13 @@ const NavStyled = styled.nav`
 
 
 function Admin() {
-  const [faculties, setFaculties] = useState(Array<FacultyData>());
+  const [faculties, setFaculties] = useState<Inf_FacultyData>({
+    id: '',
+    name: '',
+    MajorList: []
+  });       // same <Inf_FacultyData []>  and  (Array<Inf_FacultyData>()) 
 
-  const getFacBegin = (data: FacultyData[]):void => {
+  const getFacBegin = (data: Inf_FacultyData): void => {
     setFaculties(data)
   }
   
@@ -57,7 +65,7 @@ function Admin() {
       </NavStyled>
 
       <Container className='p-4' fluid>
-        <AlertForm callbackData={getFacBegin}/>
+        <AddForm callbackData={getFacBegin}/>
       </Container>
 
       <Container className='mt-3' style={{ padding: 20}}>

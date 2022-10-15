@@ -1,21 +1,26 @@
-import {useState, useEffect, createContext, Fragment} from 'react';
-// import CatNode from '../components/Data/CatNode';
-import Checkbox from '../components/Layout/Checkbox';
-import NavigationBar from '../components/Layout/NavigationBar';
+import {useState, useEffect, createContext} from 'react';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import styled from 'styled-components';
 
-import SubDashboard from '../components/Layout/DashboardSub';
-import TreeView from '../components/Layout/TreeView';
+// Components
+import Checkbox from '../components/Layout/Checkbox';
+import NavigationBar from '../components/Layout/NavigationBar';
+import StudentTreeView from '../components/Layout/StudentTreeView';
 
+// Queries and Mutations
+import { USERDATA_QUERY } from '../components/query/queryUser';
+
+// Interfaces
+import {Inf_User} from '../components/interfaces/InfOther';
 
 const ContainerFragment = styled.div`
   display: flex;
   height: 100%;
   width: 100%;
   justify-content: space-between;
-  align-items: flex-start; 
-
+  align-items: flex-start;
 `
+
 export interface ModeInf {
   modeSelected: string[]
 }
@@ -26,29 +31,65 @@ const defaultState: ModeInf = {
 
 export const ModeContext = createContext<ModeInf>(defaultState);
 
-export default function Student(){
-  const [Selected, setSelected] = useState(Array<string>('Completed', 'InProcess', 'Pending'));
-  
+
+// --> Main component <--
+function Student(){
+  const [fetchUser] = useLazyQuery(USERDATA_QUERY);
+  const [Selected, setSelected] = useState<Array<string>>(['completed', 'inprocess', 'pending']);
+  const [userInfo, setUserInfo] = useState<Inf_User>({
+    id: '',
+    fullname: '',
+    question: {
+      id: '',
+      question: '',
+      choices: [],
+      answer: ''
+    },
+    data: {
+      id: '',
+      name: '',
+      // setField: ''
+    },
+    gpa: 0.00
+  });
+
   function checkboxCallback(modeSelected: string[]){
     setSelected([...modeSelected])
   }
 
+  function setGrade(ave: number) {
+    setUserInfo((prev: Inf_User) => ({
+      ...prev, 
+      gpa : ave
+    }))
+  }
+
+  useEffect(() => {
+    const userFetch = async() => {
+      const res = await fetchUser()
+      await setUserInfo(res.data.me)
+    }
+    
+    userFetch()
+  }, [])
+  
   useEffect(() => {
     console.log(`Mode is selected = ${Selected}`)
   },[Selected]);
 
   return (
     <>
-      <Checkbox Callback={(modeFilter:string[]) => checkboxCallback(modeFilter)}/>
+      <Checkbox Callback={(modeFilter: string[]) => checkboxCallback(modeFilter)}/>
       <ContainerFragment>
         <ModeContext.Provider value={{modeSelected: Selected}}>
-          <TreeView/>
+          <StudentTreeView userCurriID={userInfo.data.id} setAveGPA={setGrade}/>
         </ModeContext.Provider>
-        <SubDashboard/>
       </ContainerFragment>
-      <NavigationBar/>
+      <NavigationBar UserInfo={userInfo}/>
     </>
   )
 }
+
+export default Student ; 
 
 

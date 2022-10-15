@@ -1,42 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {useQuery} from '@apollo/client';
-import {StudentQuestion_QUERY} from '../queryGraphQL/queryQuestion';
 
+// Queries and Mutations
+import {STUDENT_QUESTION_QUERY} from '../query/queryQuestion';
+
+
+// Components 
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 
-export default function Question(props: {parentCallback: (planSelected: string) => void, handleState: string}){
-    const [value, setValue] = useState(props.handleState);
-    const {loading, error, data} = useQuery(StudentQuestion_QUERY);
+// Interfaces
+import { Inf_User } from '../interfaces/InfOther';
+
+
+// -->  Main function component <--
+function Question(props: {parentCallback: (planSelected: string) => void, handledState: string, UserInfo: Inf_User}){
+    const [valueState, setValueState] = useState(props.handledState);
+    const {loading, error, data} = useQuery(STUDENT_QUESTION_QUERY,{
+        variables: {
+            "id" : props.UserInfo.question.id
+        }
+    });
 
     if (loading) {
         return <div>loading...</div>
     }
 
     if (error) {
-        return <div>fail to fetch, Sorry...</div> 
+        return <div>fail to fetch</div>
     }
 
     function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
-        setValue((event.target as HTMLInputElement).value);
+        setValueState((event.target as HTMLInputElement).value);
         props.parentCallback((event.target as HTMLInputElement).value)
     };
 
     return (
          <FormControl>
-             <FormLabel>{data.question.question}</FormLabel>
+             <FormLabel sx={{margin: '15px 10px'}}>{data.question.question}</FormLabel>
              <RadioGroup
                 name='Plan'
-                defaultValue="female"
-                value={value}
+                defaultValue="Normal Education Plan"
+                value={valueState}
                 onChange={handleChange} 
              >
                 {
                     data.question.choice.map((choice: String, index: number) => (
-                        <FormControlLabel key={index.toString()} value={choice} control={<Radio />} label={choice} />
+                        <FormControlLabel sx={{marginLeft: '20px'}} key={index.toString()} value={choice} control={<Radio />} label={choice} />
                     ))
                 }
              </RadioGroup>
@@ -44,4 +57,4 @@ export default function Question(props: {parentCallback: (planSelected: string) 
     );
 }
 
-
+export default Question;

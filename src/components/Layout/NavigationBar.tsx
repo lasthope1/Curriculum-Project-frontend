@@ -1,74 +1,108 @@
-import {useState} from 'react';
-import styled from 'styled-components';
-import Popup from './Info-Popup';
+import {useState, useEffect} from 'react';
+import { useQuery } from '@apollo/client';
+import '../../styles/studentNav.css';
 
-const NavigationWrapper = styled.nav`
-    background: #674B91;
-    position: fixed;
-    width: 100%;
-    height: var(--nav-size);
-    display: flex;
-    padding: 10px 32px;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: var(--border);
-    
-    top: 0px;
-    left: 0px;
-`;
+// Components
+import Popup from './QuestionsPopup';
 
-const Button = styled.button`
-    background: transparent;
-    display: box;
-    width: 100%;
-    height: 45px;
-    margin: 5px;
-    outline: none;
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    padding : 8px;
-`;
+// Queries and Mutations
+import {STUDENT_QUESTION_QUERY} from '../query/queryQuestion';
 
-export default function NavigationBar(){
+// Interfaces
+import {Inf_User} from '../interfaces/InfOther';
 
-    const [Popup_btn, setPopup_btn] = useState(false);
-    const [EduPlan, setEduPlan] = useState("Normal Education Plan");
-    // const planState : string = setPlanState(EduPlan);
+// Components
+import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
-    // function setPlanState(planSelected: string): string {
-    //     if(planSelected === "Normal Education Plan"){
-    //         return "Normal Education Plan"
-    //     }else{
-    //         return "Cooperative Education Plan"
-    //     }
+
+// --> Main function component <-- 
+function NavigationBar(props: {UserInfo: Inf_User}){
+
+    const [showDD, setShowDD] = useState<boolean>(false)
+    const [activePopup, setActivePopup] = useState(false);
+    const [EduPlan, setEduPlan] = useState('');
+    const {data, error} = useQuery(STUDENT_QUESTION_QUERY, {
+        variables: {
+            "id" : props.UserInfo.question.id
+        }
+    });
+
+    // const li_main = document.querySelector('.li-main');
+    // li_main?.addEventListener('click', handleClickMenu);
+
+    // function handleClickMenu(this: HTMLElement) {
+    //     console.log('Clicked')
+    //     this.classList.toggle("active");
     // }
+
+    useEffect(() => {
+        if(data){
+            (data.question.answer === 'normal') ? 
+                setEduPlan("Normal Educational Plan") 
+                : setEduPlan("Cooperative Educational Plan")
+        }
+    }, [data])
+
+    async function logoutUserHandler(event: React.MouseEvent<HTMLInputElement>){
+        event.preventDefault();
+        document.cookie = "user-token=; expires=Sun, 31 Oct 1999 00:00:00 UTC; path=/;";
+        window.location.href = '/';
+        // return false;
+    }
     
     return (
         <>
-            <NavigationWrapper className='navbar'>
+            <nav className='navbar-wrapper'>
                 <div>
-                    <Button className='Plan-btn' onClick={() => setPopup_btn(true)}
-                            style={
-                                {
-                                    background: "rgb(186,174,210)", 
-                                    backgroundImage: "linear-gradient(45deg, rgba(186,174,210,1) 0%, rgba(163,186,218,1) 100%)"
-                                }
-                            }>
+                    <button className='plan-btn' onClick={() => setActivePopup(true)}>
                         {EduPlan}
-                    </Button>
+                    </button>
                 </div>
-                <div>
-                    <i className='GPA'>student'gpa | </i>
-                    <i className='circle'>account_circle</i>
+                <div className='std-info'>
+                    <ul>
+                        <li className='std-gpa'>
+                            <span>GPA : {props.UserInfo.gpa}</span>
+                        </li>
+                        <li className='std-heriLine'></li>
+                        <li className={showDD ? 'std-name-act' : 'std-name'}>
+                            <ul>
+                                <li onClick={() => setShowDD(!showDD)} className='std-li'>
+                                    <span>{props.UserInfo.fullname}</span>
+                                    <i className={showDD ? 'triangle-dd-act' : 'triangle-dd'} /> 
+                                </li>
+                            </ul>
+                            {   showDD &&
+                                <div className='dd-menu' onClick={(e: React.MouseEvent<HTMLInputElement>) => logoutUserHandler(e)}>
+                                    <div className='dd-left'>
+                                        <ul>
+                                            <li>
+                                                <i><LogoutIcon/></i>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className='dd-right'>
+                                        <ul>
+                                            <li>
+                                                <i>Logout</i>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>  
+                            }
+                        </li>
+                    </ul>
                 </div>
-            </NavigationWrapper>
+            </nav>
             <Popup 
-                toggle={Popup_btn} 
-                setToggle={setPopup_btn} 
+                toggle={activePopup} 
+                setToggle={setActivePopup} 
                 parentCallback={setEduPlan}
                 handleState={EduPlan}
+                UserInfo={props.UserInfo}
             />
         </>
     )
 }
+
+export default NavigationBar ;

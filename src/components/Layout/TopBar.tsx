@@ -2,7 +2,7 @@ import {useState} from 'react';
 import styled from 'styled-components';
 import '../../styles/SearchBar.css';
 
-import {DataResult, StudentData} from '../interfaces/InfOther';
+import {IStudentData} from '../interfaces/InfOther';
 
 const TopWrapper = styled.nav`
     background: #674B91;
@@ -10,7 +10,7 @@ const TopWrapper = styled.nav`
     width: 100%;
     height: var(--nav-size);
     display: flex;
-    padding: 10px 32px;
+    padding: 17px 32px;
     align-items: center;
     justify-content: space-between;
     border-bottom: var(--border);
@@ -19,12 +19,12 @@ const TopWrapper = styled.nav`
     left: 0px;
 `;
 
-export default function TopBar(param: {placeholder: string, data: DataResult}) {
+export default function TopBar(param: {placeholder: string, data: IStudentData[]}) {
     const [filteredData, setFilteredData] = useState(Array<object>());
 
     const handleFilter = (searchWord: string) => {
         if(searchWord !== ""){
-            const newFilter = param.data.Data.filter(({name}: StudentData) => {
+            const newFilter = param.data.filter(({name}: IStudentData) => {
                 return name.includes(searchWord);
             })
             setFilteredData(newFilter)
