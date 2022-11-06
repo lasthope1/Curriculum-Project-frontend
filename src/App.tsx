@@ -13,7 +13,7 @@ import { BrowserRouter as Router, Route, Routes,} from 'react-router-dom';
 
 
 const link = createHttpLink({
-  uri: "http://localhost:3000/graphql",
+  uri: "https://curriculum-backend.onrender.com/graphql",
   credentials: 'include'
 });
 
