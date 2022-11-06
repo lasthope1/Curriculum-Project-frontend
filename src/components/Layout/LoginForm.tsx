@@ -9,7 +9,7 @@ import CardHeader from '@mui/material/CardHeader';
 import Button from '@mui/material/Button';
 
 //state type
-interface State {
+interface Inf_State {
   username: string
   password:  string
   helperText: string
@@ -17,7 +17,7 @@ interface State {
   isError: boolean
 };
 
-const initialState: State = {
+const initialState: Inf_State = {
   username: '',
   password: '',
   helperText: '',
@@ -32,7 +32,7 @@ type Action = { type: 'setUsername', payload: string }
   | { type: 'loginFailed', payload: string }
   | { type: 'setIsError', payload: boolean };
 
-const reducer = (state: State, action: Action): State => {
+const reducer = (state: Inf_State, action: Action): Inf_State => {
   switch (action.type) {
     case 'setUsername': 
       return {
@@ -108,16 +108,14 @@ function LoginForm() {
     // }
   };
 
-  const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> =
-    (event) => {
+  const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
       dispatch({
         type: 'setUsername',
         payload: event.target.value
       });
     };
 
-  const handlePasswordChange: React.ChangeEventHandler<HTMLInputElement> =
-    (event) => {
+  const handlePasswordChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
       dispatch({
         type: 'setPassword',
         payload: event.target.value

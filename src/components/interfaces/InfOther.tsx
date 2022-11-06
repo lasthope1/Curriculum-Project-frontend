@@ -1,20 +1,17 @@
 import {Inf_Question, Inf_CatNode, Inf_CourseList, Inf_Course} from '../interfaces/Interfaces' ;
-  
-interface IStudentData {
-    id: number
-    name: string
-    s_code: number
-    year: number
-}
 
+interface IAdviseeData {
+    id: string
+    student_id: string
+    major_id: string
+    curriculum_id: string
+    year_admit: string
+    adviser_id?: string
+}
 interface IAdviserData {
     id: string
-    name: string
-    advisee: {
-        id: string
-        acm_year: number
-        students: IStudentData[]
-    }[]
+    fullname: string
+    stu: IAdviseeData[]
 }
 
 interface Inf_FacultyData {
@@ -45,6 +42,7 @@ interface Inf_User {
         name: string
     }
     gpa?: number
+    isGrad?: boolean
 }
 
-export type {IAdviserData, IStudentData, Inf_FacultyData, Inf_MajorData, Inf_User, Inf_CurriData}
+export type {IAdviserData, IAdviseeData, Inf_FacultyData, Inf_MajorData, Inf_User, Inf_CurriData}

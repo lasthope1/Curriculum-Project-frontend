@@ -27,6 +27,7 @@ const STUDENT_DATA_QUERY = gql`
             credit
             newCredit
             status
+            type
         }
         credit
     }
@@ -57,7 +58,7 @@ const STUDENT_DATA_QUERY = gql`
             }
         }
     }
-`;
+`
 
 const STUDENT_FE_QUERY = gql`
     query {
@@ -93,6 +94,11 @@ const STUDENT_GRADE_QUERY = gql`
         me{
             gpa
             isGrad
+            rootCredit{
+                ge
+                fs
+                fe
+            }
         }
     }
 `

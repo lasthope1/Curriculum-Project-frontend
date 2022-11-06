@@ -2,7 +2,8 @@ import {useState} from 'react';
 import styled from 'styled-components';
 import '../../styles/SearchBar.css';
 
-import {IStudentData} from '../interfaces/InfOther';
+import {IAdviserData} from '../interfaces/InfOther';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const TopWrapper = styled.nav`
     background: #674B91;
@@ -19,26 +20,35 @@ const TopWrapper = styled.nav`
     left: 0px;
 `;
 
-export default function TopBar(param: {placeholder: string, data: IStudentData[]}) {
-    const [filteredData, setFilteredData] = useState(Array<object>());
 
-    const handleFilter = (searchWord: string) => {
-        if(searchWord !== ""){
-            const newFilter = param.data.filter(({name}: IStudentData) => {
-                return name.includes(searchWord);
-            })
-            setFilteredData(newFilter)
-        }else{
-            setFilteredData([])
-        }
+// --> Main function component <-- 
+function TopBar(props: {UserInfo: IAdviserData}) {
+    const [filteredData, setFilteredData] = useState(Array<object>());
+    const [showDD, setShowDD] = useState<boolean>(false)
+
+    async function logoutUserHandler(event: React.MouseEvent<HTMLInputElement>){
+        event.preventDefault();
+        document.cookie = "user-token=; expires=Sun, 31 Oct 1999 00:00:00 UTC; path=/;";
+        window.location.href = '/';
+        // return false;
     }
+
+    // const handleFilter = (searchWord: string) => {
+    //     if(searchWord !== ""){
+    //         const newFilter = param.data.filter(({name}: IStudentData) => {
+    //             return name.includes(searchWord);
+    //         })
+    //         setFilteredData(newFilter)
+    //     }else{
+    //         setFilteredData([])
+    //     }
+    // }
 
   return (
     <TopWrapper>
         <div className="searchWrapper">
             <div className="searchInputs">
-                <input type="text" placeholder={param.placeholder} 
-                    onChange={(event) => handleFilter(event.target.value)}/>
+                <input type="text" placeholder='Enter student code'/>
                 {/* <div className="searchIcon"></div> */}
             </div>
             { filteredData.length !== 0 && (
@@ -55,9 +65,42 @@ export default function TopBar(param: {placeholder: string, data: IStudentData[]
                 )
             }
         </div>
-        <div className="Prof-area">
-            <i>This is profile area</i>
-        </div>
+        <div className='std-info'>
+                    <ul>
+                        {/* <li className='std-gpa'>
+                            <span>GPA : {props.UserInfo.gpa}</span>
+                        </li>
+                        <li className='std-heriLine'></li> */}
+                        <li className={showDD ? 'std-name-act' : 'std-name'}>
+                            <ul>
+                                <li onClick={() => setShowDD(!showDD)} className='std-li'>
+                                    <span style={{fontSize: '20px'}}>{props.UserInfo.fullname}</span>
+                                    <i className={showDD ? 'triangle-dd-act' : 'triangle-dd'} /> 
+                                </li>
+                            </ul>
+                            {   showDD &&
+                                <div className='dd-menu' onClick={(e: React.MouseEvent<HTMLInputElement>) => logoutUserHandler(e)}>
+                                    <div className='dd-left'>
+                                        <ul>
+                                            <li>
+                                                <i><LogoutIcon/></i>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className='dd-right'>
+                                        <ul>
+                                            <li>
+                                                <i>Logout</i>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>  
+                            }
+                        </li>
+                    </ul>
+                </div>
     </TopWrapper>
   )
 }
+
+export default TopBar;

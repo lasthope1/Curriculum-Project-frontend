@@ -72,10 +72,6 @@ function Student(){
     
     userFetch()
   }, [])
-  
-  useEffect(() => {
-    console.log(`Mode is selected = ${Selected}`)
-  },[Selected]);
 
   return (
     <>

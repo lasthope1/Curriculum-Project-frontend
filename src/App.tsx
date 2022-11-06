@@ -8,6 +8,7 @@ import Advicer from './pages/Advicer';
 import Admin from './pages/Admin';
 import AdminFaculty from './pages/AdminFaculty';
 import Login from './pages/Login';
+import ErrorPage from './pages/ErrorPage';
 import { BrowserRouter as Router, Route, Routes,} from 'react-router-dom';
 
 
@@ -32,6 +33,7 @@ function App() {
             <Route path="/Advicer" element={<Advicer/>}/>
             <Route path="/Admin" element={<Admin/>}/>
             <Route path="/Admin/:id" element={<AdminFaculty/>}/>
+            <Route path="/error" element={<ErrorPage/>}/>
           </Routes>
       </Router>
     </ApolloProvider>

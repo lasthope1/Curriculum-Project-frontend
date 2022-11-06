@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react';
 import {useQuery, useLazyQuery} from '@apollo/client';
+import {v4 as uuid} from 'uuid'
 
 // Queries and Mutations 
 import {ADMIN_DATA_QUERY} from '../query/queryData';
@@ -7,8 +8,6 @@ import {ADMIN_DATA_QUERY} from '../query/queryData';
 // Components
 import TreeView from '@mui/lab/TreeView';
 import TreeItem from '@mui/lab/TreeItem';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
@@ -26,6 +25,8 @@ import NoteAddOutlinedIcon from '@mui/icons-material/NoteAddOutlined';
 import DifferenceOutlinedIcon from '@mui/icons-material/DifferenceOutlined';
 import AllInboxOutlinedIcon from '@mui/icons-material/AllInboxOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 // Interfaces
 import {Inf_CatNode, Inf_CourseList, Inf_Course} from '../interfaces/Interfaces';
@@ -35,26 +36,6 @@ import {Inf_CurriData} from '../interfaces/InfOther';
 import {instanceOfCat, instanceOfCL} from '../../functions/InstanceOfNodes';
 
 type NodeType = Inf_CatNode | Inf_CourseList | Inf_Course;
-
-// function handleDoubleClick(event: React.MouseEvent<HTMLElement> , Target: any) {
-//     event.preventDefault();
-//     setToggleEditMode(true);
-//     setTargetName(Target.id);
-//     setNameChanged(Target.name);
-
-// }
-
-// function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-//     if(event.key === 'Enter' || event.key === 'Escape'){
-//         event.preventDefault();
-//         event.stopPropagation();
-//         setToggleEditMode(false);
-//     }
-// }
-
-// function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-//     setNameChanged(event.target.value);
-// } 
 
 function dataLabel(node: Inf_CatNode | Inf_CourseList | Inf_Course , 
                     isEditMode: boolean, 
@@ -73,7 +54,7 @@ function dataLabel(node: Inf_CatNode | Inf_CourseList | Inf_Course ,
         }
     }
 
-    const typeCheck = () => {
+    const iconDisplayer = () => {
         if(instanceOfCat(node) || instanceOfCL(node)){
             return (
                 <Box sx={{display: 'flex', '& hr': {mx: 1.5, height: 'auto'}}}>
@@ -107,7 +88,7 @@ function dataLabel(node: Inf_CatNode | Inf_CourseList | Inf_Course ,
                     <span>{node.name}</span>
                     {/* <span>{node.credit}</span> */}
                 </Box>
-                { (isEditMode) ? typeCheck() : <span>{node.credit}</span> }
+                { (isEditMode) ? iconDisplayer() : <span>{node.credit}</span> }
             </Box>
         )
     }
@@ -118,10 +99,11 @@ function dataLabel(node: Inf_CatNode | Inf_CourseList | Inf_Course ,
                 <span style={{paddingRight: '1.5rem'}}>{node.COURSENO}</span>
                 <span style={{paddingRight: '0.5rem'}}>{node.name}</span>
             </Box>
-            { (isEditMode) ? typeCheck() : <span>{node.credit}</span> }
+            { (isEditMode) ? iconDisplayer() : <span>{node.credit}</span> }
         </Box>
     )
 }
+
 
 function RecursiveElement(param: { nodeElement: NodeType,
                 elementKey: number, 
@@ -132,6 +114,7 @@ function RecursiveElement(param: { nodeElement: NodeType,
         const [childrenCat_list, setChildrenCat_list] = useState<Array<Inf_CourseList>>([])
         const [childrenList, setChildrenList] = useState<Array<Inf_Course>>([])
         const [hasListChildren, setHasListChildren] = useState<boolean>(false)
+        let nodeElement: NodeType[] = [];
 
         async function setData(){
             if(instanceOfCat(param.nodeElement)){
@@ -182,6 +165,20 @@ function RecursiveElement(param: { nodeElement: NodeType,
             }
         }
 
+        function zipWith(arr: NodeType[]) {
+            let tempElement : Array<JSX.Element> = [];
+            arr?.map((node: NodeType, index: number) => {
+                tempElement = [...tempElement,
+                    <RecursiveElement nodeElement={node} 
+                                elementKey={index}
+                                isEditMode={param.isEditMode}
+                    />
+                ]
+            })
+
+            return tempElement;
+        }
+
     return (
         <>
             {
@@ -193,27 +190,11 @@ function RecursiveElement(param: { nodeElement: NodeType,
                                 addCourse, 
                                 hasListChildren,
                                 param.elementKey
-                            )}>
+                            )}>      
                         {
-                            childrenCat?.map((node: Inf_CatNode, index: number) => 
-                                <RecursiveElement nodeElement={node} 
-                                    elementKey={index}
-                                    isEditMode={param.isEditMode}/>
-                                )
-                        }
-                        {
-                            childrenCat_list?.map((node: Inf_CourseList, index: number) => 
-                                <RecursiveElement nodeElement={node} 
-                                    elementKey={index} 
-                                    isEditMode={param.isEditMode}/>
-                            )
-                        }
-                        {
-                            childrenList?.map((node: Inf_Course, index: number) => 
-                                <RecursiveElement nodeElement={node} 
-                                    elementKey={index}
-                                    isEditMode={param.isEditMode}/>
-                            )
+                            zipWith(nodeElement.concat(childrenCat,
+                                childrenCat_list, childrenList))
+                                .map((el: JSX.Element) => el)
                         }
                     </TreeItem> : 
                     <TreeItem key={param.elementKey} nodeId={param.nodeElement.id} 
@@ -270,7 +251,7 @@ function AdminTreeView(prop: {CurrTarget: string}) {
             { 
                 ...prevState, 
                 cat : [ ...prevState.cat , {
-                    id: Math.floor(Math.random() * 100).toString(),
+                    id: uuid(),
                     name: 'New catagory node',
                     refCat: [],
                     refList: [],
@@ -318,7 +299,6 @@ function AdminTreeView(prop: {CurrTarget: string}) {
             </Box>
             <Box>
                 <TreeView
-                    aria-label="multi-select"
                     defaultCollapseIcon={<ExpandMoreIcon/>}
                     defaultExpandIcon={<ChevronRightIcon/>}
                     expanded={expanded}
@@ -399,7 +379,7 @@ export default AdminTreeView ;
 //                     ]
 //                 }
 //             ],
-//             refCourse: []
+//             credit: 56
 //         },
 //         {
 //             id: 'FS01',
@@ -469,7 +449,7 @@ export default AdminTreeView ;
 //                     ] 
 //                 }
 //             ],
-//             refCourse: []
+//             credit: 33
 //         }
 //     ]
 // }

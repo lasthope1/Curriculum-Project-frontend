@@ -12,6 +12,7 @@ import {STUDENT_QUESTION_QUERY} from '../query/queryQuestion';
 import {Inf_User} from '../interfaces/InfOther';
 
 // Components
+import Button from '@mui/material/Button';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 
@@ -55,9 +56,15 @@ function NavigationBar(props: {UserInfo: Inf_User}){
         <>
             <nav className='navbar-wrapper'>
                 <div>
-                    <button className='plan-btn' onClick={() => setActivePopup(true)}>
+                    <Button className='plan-btn' 
+                        variant='contained'
+                        color='info'
+                        onClick={() => setActivePopup(true)}>
                         {EduPlan}
-                    </button>
+                    </Button>
+                </div>
+                <div style={{color: '#fff', fontSize: '22px'}}>
+                    <span>{props.UserInfo.data.name}</span>
                 </div>
                 <div className='std-info'>
                     <ul>

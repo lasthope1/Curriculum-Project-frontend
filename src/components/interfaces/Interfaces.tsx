@@ -13,6 +13,7 @@ interface Inf_CourseList{
     courses: Inf_Course[]
     credit: number
     newCredit: number
+    type: string
     status?: string
 }
 

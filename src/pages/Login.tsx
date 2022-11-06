@@ -51,8 +51,7 @@ function Login(){
                     </div>
                     <div className = 'block'></div>
                     <div id="Sidenav" className="sidenav">
-                        <a id={show.studentLogin ? 'student-active' : 'student'} onClick={handleLoginForm}>Student</a>
-                        <a id={show.advicerLogin ? 'advicer-active' : 'advicer'} onClick={handleLoginForm}>Adviser</a>
+                        <a id={show.studentLogin ? 'student-active' : 'student'} onClick={handleLoginForm}>Student &emsp; &nbsp; & Advisor</a>
                         <a id={show.adminLogin ? 'admin-active' : 'admin'} onClick={handleLoginForm}>Admin</a>
                     </div>
                 </div>

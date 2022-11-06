@@ -1,11 +1,11 @@
 
 import {useState} from 'react';
-import {useMutation} from '@apollo/client';
+import {useMutation, useLazyQuery} from '@apollo/client';
 import '../../styles/Popup.css';
 
 // Queries and Mutations 
 import { STUDENT_UPDATE_QUESTION_MUTATION } from '../query/queryQuestion';
-import {STUDENT_DATA_QUERY} from '../query/queryData';
+import {STUDENT_DATA_QUERY, STUDENT_FE_QUERY, STUDENT_GRADE_QUERY, STUDENT_RESET_QUERY} from '../query/queryData';
 
 // Components
 import Question from './question';
@@ -24,6 +24,9 @@ function Popup( props :
         UserInfo: Inf_User        
     }){
     
+    const [fetchFe] = useLazyQuery(STUDENT_FE_QUERY)
+    const [fetchGrade] = useLazyQuery(STUDENT_GRADE_QUERY)
+    const [fetchReset] = useLazyQuery(STUDENT_RESET_QUERY)
     const [eduPlan, setEduPlan] = useState('')
     var value : string = eduPlan;
 

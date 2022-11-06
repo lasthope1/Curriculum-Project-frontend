@@ -12,17 +12,17 @@
     padding: 10px;
 }
 
-.Completed {
+.completed {
     padding: 5px;
     color: green;
 }
 
-.In-process {
+.inprocess {
     padding-left: 5px;
     color: orangered;
 }
 
-.Pending {
+.pending {
     padding-left: 5px;
     color: black;
 }
