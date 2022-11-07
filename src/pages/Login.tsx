@@ -56,13 +56,9 @@ function Login(){
                     </div>
                 </div>
                 {   show.studentLogin &&
+                    // <a href='http://localhost:3000/auth/cmu'>
                     <a href='https://curriculum-backend.onrender.com/auth/cmu'>
                         <button className='btn-student'>Login with CMU account</button>
-                    </a>
-                }
-                {   show.advicerLogin &&
-                    <a href='https://curriculum-backend.onrender.com/auth/cmu'>
-                        <button className='btn-adviser'>Login with CMU account</button>
                     </a>
                 }
                 {

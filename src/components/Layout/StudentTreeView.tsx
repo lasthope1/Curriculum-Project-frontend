@@ -269,12 +269,12 @@ function StudentTreeView(param: {userCurriID: string, setAveGPA: (gpa: number) =
 
     return (
         <>
-        <div className='showGrad' style={{display: 'flex', position: 'absolute', top: '13%', left: '29%', color: '#f76464'}}>
+        <div className='showGrad' style={{display: 'flex', position: 'absolute', top: '13%', left: '29%'}}>
             {   (isGrad) ? 
                     <h3 style={{color:'green'}}>
                         You have fullfilled all requirements for graduation 
                     </h3> : 
-                    <h3 style={{color: 'black'}}> 
+                    <h3 style={{color: '#f76464'}}> 
                         You have not fullfilled all requirements for graduation
                     </h3>}
         </div>

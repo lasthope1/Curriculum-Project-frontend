@@ -21,7 +21,7 @@ function Popup( props :
         parentCallback: (planSelected: string) => void,                 
         toggle: boolean,                 
         handleState: string,
-        UserInfo: Inf_User        
+        UserInfo: Inf_User      
     }){
     
     const [fetchFe] = useLazyQuery(STUDENT_FE_QUERY)
@@ -39,8 +39,12 @@ function Popup( props :
             query: STUDENT_DATA_QUERY,
             variables: {
                 "id": props.UserInfo.data.id
-            }
-        }]
+            }},
+            {
+                query: STUDENT_FE_QUERY,
+        }],
+        awaitRefetchQueries: true,
+        notifyOnNetworkStatusChange: true
     })
     
     function handleSave(event : React.MouseEvent<HTMLButtonElement>) {
