@@ -1,6 +1,6 @@
 
 import {useState} from 'react';
-import {ApolloClient, ApolloProvider, InMemoryCache, createHttpLink} from '@apollo/client'
+import {ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, HttpLink} from '@apollo/client'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Student from './pages/Student';
@@ -12,7 +12,7 @@ import ErrorPage from './pages/ErrorPage';
 import { BrowserRouter as Router, Route, Routes,} from 'react-router-dom';
 
 
-const link = createHttpLink({
+const link = new HttpLink({
   // uri: "http://localhost:3000/graphql",
   uri: "https://curriculum-backend.onrender.com/graphql/",
   credentials: 'include'
