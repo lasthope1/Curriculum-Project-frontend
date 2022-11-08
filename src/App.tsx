@@ -15,7 +15,7 @@ import { BrowserRouter as Router, Route, Routes,} from 'react-router-dom';
 const link = createHttpLink({
   // uri: "http://localhost:3000/graphql",
   uri: "https://curriculum-backend.onrender.com/graphql/",
-  // credentials: 'include'
+  credentials: 'include'
 });
 
 const client = new ApolloClient({
@@ -30,7 +30,7 @@ function App() {
       <Router>
           <Routes>
             <Route path="/" element={<Login/>}/>
-            <Route path="/Student" element={<Student/>}/>
+            <Route path="/Student:id" element={<Student/>}/>
             <Route path="/Advicer" element={<Advicer/>}/>
             <Route path="/Admin" element={<Admin/>}/>
             <Route path="/Admin/:id" element={<AdminFaculty/>}/>
