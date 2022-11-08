@@ -12,15 +12,15 @@ import ErrorPage from './pages/ErrorPage';
 import { BrowserRouter as Router, Route, Routes,} from 'react-router-dom';
 
 
-const link = new HttpLink({
+const link = createHttpLink({
   // uri: "http://localhost:3000/graphql",
   uri: "https://curriculum-backend.onrender.com/graphql/",
   credentials: 'include'
 });
 
 const client = new ApolloClient({
-  cache : new InMemoryCache(),
-  link
+  link,
+  cache : new InMemoryCache()
 });
 
 function App() {
