@@ -47,6 +47,7 @@ const ADVISERDATA_QUERY = gql `
                 adviser_id
                 # adviser_name
                 # adviser_cmu_account
+                grade_status
             }
         }
     }

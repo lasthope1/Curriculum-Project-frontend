@@ -20,14 +20,7 @@ const CardStyled = styled.div`
 function FacultyCard(prop: {FacData: Inf_FacultyData}) {
 
   const [initFacData, setInitFacData] = useState<Inf_FacultyData[]>(FacDataTest)
-  // const [inputMaj, setInputMaj] = useState(():string[] => {
-  //   var tempArr: Array<string> = [];
-  //   var Length: number = getLengthFacDatas();
-  //   for(var i: number = 0; i < Length; i++){
-  //     tempArr.push('');
-  //   }
-  //   return tempArr;
-  // });
+  const [inputMaj, setInputMaj] = useState<Array<string>>([]);
 
   useEffect(() => {
     if(prop.FacData.name !== ''){
@@ -64,11 +57,11 @@ function FacultyCard(prop: {FacData: Inf_FacultyData}) {
   //   }
   // }
   
-  // function inputMajHandler(event: React.ChangeEvent<HTMLInputElement>, index: number) {
-  //   var tempMaj: string[] = [...inputMaj];
-  //   tempMaj[index] = event.target.value;
-  //   setInputMaj(tempMaj);
-  // }
+  function inputMajHandler(event: React.ChangeEvent<HTMLInputElement>, index: number) {
+    var tempMaj: string[] = [...inputMaj];
+    tempMaj[index] = event.target.value;
+    setInputMaj(tempMaj);
+  }
 
   // function addMajHandler(event: React.MouseEvent<HTMLButtonElement>, index: number) {
   //   event.preventDefault();
@@ -124,7 +117,7 @@ function FacultyCard(prop: {FacData: Inf_FacultyData}) {
                           className='d-inline form-control-sm w-75 mw-50 border-top-0 border-start-0 border-end-0'
                           style={{height: 30}}
                           // value={inputMaj[index]}
-                          // onChange={(evt: React.ChangeEvent<HTMLInputElement>) => inputMajHandler(evt, index)}
+                          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => inputMajHandler(evt, index)}
                           type='text'
                           placeholder='Add new major'/>
                         <Button className='ms-2 me-2 rounded-circle fw-bold'
@@ -149,7 +142,7 @@ export { FacultyCard }
 const MajorDataTest : Inf_MajorData[] = [
   {
     id: 'Major1',
-    name: 'Computer'
+    name: 'Computer Engineering'
   }
 ]
 

@@ -10,6 +10,7 @@ import TreeItem from '@mui/lab/TreeItem';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // Icons
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -46,7 +47,7 @@ const defaultAdviserData: IAdviserData = {
 
 
 // --> Main function component <--
-function Adviser() {
+function Advisor() {
   const {data, loading} = useQuery(ADVISERDATA_QUERY)
   const [initAdviseeData, setInitAdvisee] = useState<GroupedByYear[]>([])
   const [userInfo, setUserInfo] = useState<IAdviserData>(defaultAdviserData)
@@ -54,8 +55,8 @@ function Adviser() {
 
   function groupByYear(advisees: IAdviseeData[]): GroupedByYear[] {
     let groupedResult: GroupedByYear[] = []
-    advisees?.map( async(stud: IAdviseeData) => {
-      const index: number = await groupedResult.findIndex((year: GroupedByYear) => 
+    advisees.map( async(stud: IAdviseeData) => {
+      const index: number = groupedResult.findIndex((year: GroupedByYear) => 
         year.year === stud.year_admit
       )
 
@@ -68,23 +69,29 @@ function Adviser() {
         })
       }
     })
+
     return groupedResult;
   }
 
   useEffect(() => {
     if(data){
+      console.log(data);
       setUserInfo(data.advisor);
       setInitAdvisee(groupByYear(data.advisor.stu))
+      // console.log(groupByYear(data.advisor.stu))
     }
   }, [data])
-
-  if(loading) {return <p>loading...</p>}
   
   return (
     <>
       <TopBar UserInfo={userInfo}/>
       {/* <FilteredStudentName studentData={studentData} /> */}
       <Container sx={{display: 'flex', position: 'absolute', width: '30%', top: '13%', left: '12%'}}>
+        {
+          (loading) ? 
+          <Box sx={{ display: 'flex', position: 'absolute', top: '20%', left: '47.5%'}}>
+            <CircularProgress size={65}/>
+          </Box> : 
         <TreeView aria-label="multi-select"
             defaultCollapseIcon={<ExpandMoreIcon/>}
             defaultExpandIcon={<ChevronRightIcon/>}
@@ -94,16 +101,17 @@ function Adviser() {
             multiSelect >
             {
                 initAdviseeData.map((stdGroup: GroupedByYear, index: number) => (
-                    <TreeItem sx={{marginBottom: '30px'}} 
+                    <TreeItem sx={{marginBottom: '25px'}} 
                         key={index.toString()} 
                         nodeId={stdGroup.year} 
                         label={stdGroup.year} >
                       {
                         stdGroup.students.map((std: IAdviseeData, index: number) => (
                           <TreeItem key={std.id} nodeId={std.id.toString()} label={
-                            <Box>
+                            <Box sx={{justifyContent: 'between', color: (std.grade_status === 'Graduted') ? 'green' : 'black'}}>
                               {/* <span style={{marginRight: '40px'}}>{std.s_code}</span> */}
-                              <span>{std.student_id}</span>
+                              <span style={{marginRight: 20}}>{std.student_id}</span>
+                              <span style={{marginLeft: 170}}>{std.grade_status}</span>
                             </Box>
                           }/>
                         ))
@@ -117,12 +125,13 @@ function Adviser() {
                 // )
             }
         </TreeView>
+      }
       </Container>
     </>
   )
 }
 
-export default Adviser;
+export default Advisor;
 
 // const studentData: IStudentData[] = [
 //     {

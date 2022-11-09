@@ -7,6 +7,7 @@ interface IAdviseeData {
     curriculum_id: string
     year_admit: string
     adviser_id?: string
+    grade_status?: string
 }
 interface IAdviserData {
     id: string

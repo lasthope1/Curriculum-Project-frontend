@@ -1,10 +1,9 @@
 
-import {useState} from 'react';
 import {ApolloClient, ApolloProvider, InMemoryCache, createHttpLink, HttpLink} from '@apollo/client'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Student from './pages/Student';
-import Advicer from './pages/Advicer';
+import Advisor from './pages/Advisor';
 import Admin from './pages/Admin';
 import AdminFaculty from './pages/AdminFaculty';
 import Login from './pages/Login';
@@ -30,7 +29,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Login/>}/>
             <Route path="/Student" element={<Student/>}/>
-            <Route path="/Advicer" element={<Advicer/>}/>
+            <Route path="/Advisor" element={<Advisor/>}/>
             <Route path="/Admin" element={<Admin/>}/>
             <Route path="/Admin/:id" element={<AdminFaculty/>}/>
             <Route path="/error" element={<ErrorPage/>}/>
