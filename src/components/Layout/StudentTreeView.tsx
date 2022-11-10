@@ -38,7 +38,7 @@ function labelData(node: NodeType, catCredit: CatCre, typeReq: string) {
     function statusColor(status: string | undefined) {
         switch(status){
             case 'completed' : return 'green'
-            case 'inprocess' : return 'orangered'
+            case 'inprocess' : return '#dd7800'
             default : {
                 switch(typeReq){
                     case 'require' : return '#ef4646'
