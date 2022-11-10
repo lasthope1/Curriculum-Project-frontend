@@ -214,7 +214,8 @@ function StudentTreeView(param: {userCurriID: string, setAveGPA: (gpa: number) =
 
     const fetchGPA = async() => {
         const res = await fetchGrade()
-        param.setAveGPA(res.data.me.gpa)
+        const gpa = res.data.me.gpa
+        param.setAveGPA(Number(gpa))
         setIsGrad((res.data.me.isGrad === 'false') ? false : true)
         setCatCredit(res.data.me.rootCredit)
     }
