@@ -84,9 +84,8 @@ function Advisor() {
   
   return (
     <>
-      <TopBar UserInfo={userInfo}/>
       {/* <FilteredStudentName studentData={studentData} /> */}
-      <Container sx={{display: 'flex', position: 'absolute', width: '30%', top: '13%', left: '12%'}}>
+      <Container sx={{display: 'flex', position: 'absolute', width: '70%', top: '13%', left: '12%'}}>
         {
           (loading) ? 
           <Box sx={{ display: 'flex', position: 'absolute', top: '20%', left: '47.5%'}}>
@@ -108,10 +107,10 @@ function Advisor() {
                       {
                         stdGroup.students.map((std: IAdviseeData, index: number) => (
                           <TreeItem key={std.id} nodeId={std.id.toString()} label={
-                            <Box sx={{justifyContent: 'between', color: (std.grade_status === 'Graduted') ? 'green' : 'black'}}>
+                            <Box sx={{justifyContent: 'between'}}>
                               {/* <span style={{marginRight: '40px'}}>{std.s_code}</span> */}
                               <span style={{marginRight: 20}}>{std.student_id}</span>
-                              <span style={{marginLeft: 170}}>{std.grade_status}</span>
+                              <span style={{marginLeft: 600, color: (std.grade_status === 'Graduted') ? 'green' : (std.grade_status === 'Processing') ? '#e57500' : '#000'}}>{std.grade_status}</span>
                             </Box>
                           }/>
                         ))
@@ -127,6 +126,7 @@ function Advisor() {
         </TreeView>
       }
       </Container>
+      <TopBar UserInfo={userInfo}/>
     </>
   )
 }
