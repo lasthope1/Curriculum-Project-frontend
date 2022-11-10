@@ -69,7 +69,7 @@ function NavigationBar(props: {UserInfo: Inf_User}){
                 <div className='std-info'>
                     <ul>
                         <li className='std-gpa'>
-                            <span>GPA : {props.UserInfo.gpa}</span>
+                            <span>GPA : {(props.UserInfo.gpa === 0) ? '-' : props.UserInfo.gpa}</span>
                         </li>
                         <li className='std-heriLine'></li>
                         <li className={showDD ? 'std-name-act' : 'std-name'}>
